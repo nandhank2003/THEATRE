@@ -10,6 +10,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 import passport from "passport";
 import connectDB from "./config/db.js";
 import Screen from "./models/Screen.js";
@@ -126,11 +127,22 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "backup_secret",
-    resave: false,
-    saveUninitialized: false,
-  })
+    session({
+        secret: process.env.SESSION_SECRET || "backup_secret",
+        resave: false, // Don't save session if unmodified
+        saveUninitialized: false, // Don't create session until something stored
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGO_URI,
+            collectionName: "sessions", // Collection to store sessions
+            ttl: 14 * 24 * 60 * 60, // Session TTL = 14 days
+            autoRemove: "native", // Let MongoDB handle expired session cleanup
+        }),
+        cookie: {
+            maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+            secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+            httpOnly: true,
+        },
+    })
 );
 
 app.use(passport.initialize());
