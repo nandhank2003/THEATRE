@@ -7,7 +7,7 @@ const isLocal = window.location.hostname === "localhost" || window.location.host
 
 const API_BASE = isLocal
   ? "http://localhost:5000/api/users"
-  : "https://theatre-1-err2.onrender.com/api/users"; // ✅ your live Render backend
+  : "https://theatre-mrqa.onrender.com/api/users"; // ✅ your new live Render backend
 
 // =============================
 // 🧭 FORM TOGGLE

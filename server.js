@@ -72,6 +72,7 @@ app.use(
           "'self'",
           process.env.FRONTEND_URL, // Your live frontend URL
           process.env.BACKEND_URL, // Your live backend URL
+          "https://theatre-mrqa.onrender.com", // ✅ Explicitly allow your new Render URL
           "http://localhost:5173", // Your local frontend for development
           "http://localhost:5000", // Your local backend for development
         ],
@@ -88,6 +89,7 @@ app.use(
 app.use(morgan("dev"));
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  "https://theatre-mrqa.onrender.com", // ✅ Allow your new Render URL for CORS
   "http://localhost:5173", // Default for Vite/React dev
   "http://localhost:3000", // Default for Create React App dev
   "http://localhost:5000", // Your local backend
