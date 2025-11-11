@@ -1,0 +1,1695 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Copperplate', 'Copperplate Gothic Light', sans-serif;
+    background: #000;
+    color: #fff;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+
+/* Navbar */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.4s ease;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    z-index: 1001;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 20px rgba(128, 128, 128, 0.5));
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+.logo span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #666 0%, #999 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-links li a {
+    color: #ccc;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-links li a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #555, #888);
+    transition: width 0.3s ease;
+}
+
+.nav-links li a:hover {
+    color: #fff;
+}
+
+.nav-links li a:hover::after {
+    width: 100%;
+}
+
+.login-btn {
+    padding: 0.6rem 1.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: #ccc;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.login-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    box-shadow: 0 0 25px rgba(128, 128, 128, 0.3);
+    transform: translateY(-2px);
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.hamburger span {
+    width: 28px;
+    height: 3px;
+    background: #ccc;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Movies Hero Section */
+.movies-hero {
+    position: relative;
+    height: 50vh;
+    min-height: 400px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    margin-top: 70px;
+}
+
+.movies-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+    opacity: 0.5;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+}
+
+.movies-hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.movies-title {
+    font-size: 4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #666, #999);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    animation: fadeInUp 0.8s ease;
+    text-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+}
+
+.movies-subtitle {
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+    animation: fadeInUp 0.8s ease 0.2s backwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Movies Section */
+.movies-section {
+    padding: 4rem 5%;
+    background: #000;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.movies-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Movie Card */
+.movie-card {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.movie-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(128, 128, 128, 0.05), rgba(64, 64, 64, 0.05));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+}
+
+.movie-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.movie-card:hover::before {
+    opacity: 1;
+}
+
+.movie-poster {
+    position: relative;
+    width: 100%;
+    padding-top: 145%;
+    overflow: hidden;
+    background: #0a0a0a;
+}
+
+.movie-poster img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    filter: grayscale(0.3) brightness(0.9);
+}
+
+.movie-card:hover .movie-poster img {
+    transform: scale(1.1);
+    filter: grayscale(0) brightness(1);
+}
+
+.movie-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    padding: 0.35rem 0.7rem;
+    border-radius: 15px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    z-index: 2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.movie-info {
+    padding: 1rem;
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+}
+
+.movie-title-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.movie-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    flex-wrap: wrap;
+}
+
+.movie-meta span {
+    white-space: nowrap;
+}
+
+.movie-genre {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    margin-bottom: 0.6rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.movie-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.6rem;
+}
+
+.star {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.rating-text {
+    color: #ccc;
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-left: 0.2rem;
+}
+
+.movie-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.6rem;
+}
+
+.price-label {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    margin-left: 0.2rem;
+}
+
+.book-btn {
+    width: 100%;
+    padding: 0.7rem;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #ccc;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.book-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(128, 128, 128, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Footer */
+.footer {
+    background: #000;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 3rem 5% 2rem;
+    position: relative;
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(128, 128, 128, 0.3) 20%,
+        rgba(128, 128, 128, 0.5) 50%,
+        rgba(128, 128, 128, 0.3) 80%,
+        transparent 100%);
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-col h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    background: linear-gradient(135deg, #ccc, #666);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.footer-brand .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.footer-brand .footer-logo img {
+    height: 35px;
+    width: auto;
+}
+
+.footer-brand .footer-logo h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #666 0%, #999 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.footer-description {
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    color: #888;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.social-links a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(128, 128, 128, 0.2);
+}
+
+.social-icon {
+    font-style: normal;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.footer-col ul {
+    list-style: none;
+}
+
+.footer-col ul li {
+    margin-bottom: 0.7rem;
+}
+
+.footer-col ul li a {
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.footer-col ul li a:hover {
+    color: #ccc;
+    transform: translateX(5px);
+}
+
+.contact-info li {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    line-height: 2;
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 1.5rem;
+}
+
+.footer-bottom p {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #ccc;
+}
+
+.footer-links span {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Large Desktop */
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1800px;
+    }
+
+    .movies-grid {
+        gap: 2.5rem;
+    }
+
+    .movies-title {
+        font-size: 5rem;
+    }
+
+    .movies-subtitle {
+        font-size: 1.5rem;
+    }
+}
+
+/* Desktop */
+@media (max-width: 1440px) {
+    .movies-grid {
+        gap: 1.8rem;
+    }
+
+    .movie-title-text {
+        font-size: 1.2rem;
+    }
+}
+
+/* Laptop */
+@media (max-width: 1200px) {
+    nav {
+        padding: 1rem 4%;
+    }
+
+    .movies-section {
+        padding: 3.5rem 4%;
+    }
+
+    .movies-grid {
+        gap: 1.5rem;
+    }
+
+    .footer {
+        padding: 2.5rem 4% 2rem;
+    }
+
+    .footer-top {
+        gap: 2rem;
+    }
+}
+
+/* Tablet Landscape */
+@media (max-width: 1024px) {
+    .logo span {
+        font-size: 1.3rem;
+    }
+
+    .logo img {
+        height: 36px;
+    }
+
+    .nav-links {
+        gap: 1.5rem;
+    }
+
+    .nav-links li a {
+        font-size: 0.9rem;
+    }
+
+    .movies-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .movies-hero {
+        min-height: 350px;
+    }
+
+    .movies-title {
+        font-size: 3rem;
+    }
+
+    .movies-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .movie-title-text {
+        font-size: 1.15rem;
+    }
+
+    .movie-info {
+        padding: 1.3rem;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Tablet Portrait */
+@media (max-width: 900px) {
+    .movies-grid {
+        gap: 1.2rem;
+    }
+
+    .movie-title-text {
+        font-size: 1.1rem;
+    }
+
+    .movie-meta {
+        font-size: 0.8rem;
+    }
+
+    .movie-genre {
+        font-size: 0.85rem;
+    }
+}
+
+/* Mobile Landscape & Large Mobile */
+@media (max-width: 768px) {
+    nav {
+        padding: 0.8rem 5%;
+        background: rgba(0, 0, 0, 0.95);
+    }
+
+    .logo span {
+        font-size: 1.2rem;
+    }
+
+    .logo img {
+        height: 32px;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100vh;
+        width: 75%;
+        max-width: 300px;
+        background: rgba(0, 0, 0, 0.98);
+        backdrop-filter: blur(30px);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        transition: right 0.4s ease;
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 2rem;
+        z-index: 999;
+    }
+
+    .nav-links.active {
+        right: 0;
+        box-shadow: -10px 0 40px rgba(0, 0, 0, 0.9);
+    }
+
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-links li a {
+        font-size: 1.1rem;
+        display: block;
+        padding: 0.8rem 1rem;
+    }
+
+    .hamburger {
+        display: flex;
+        position: relative;
+        z-index: 1000;
+    }
+
+    .login-btn {
+        position: absolute;
+        bottom: 3rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        text-align: center;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .movies-hero {
+        min-height: 300px;
+        height: 40vh;
+        margin-top: 60px;
+    }
+
+    .movies-title {
+        font-size: 2.5rem;
+        padding: 0 1rem;
+    }
+
+    .movies-subtitle {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+    }
+
+    .movies-section {
+        padding: 3rem 5%;
+    }
+
+    .movies-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
+    .movie-badge {
+        top: 10px;
+        right: 10px;
+        padding: 0.35rem 0.7rem;
+        font-size: 0.7rem;
+    }
+
+    .movie-info {
+        padding: 1.2rem;
+    }
+
+    .movie-title-text {
+        font-size: 1rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .movie-meta {
+        font-size: 0.75rem;
+        gap: 0.6rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .movie-genre {
+        font-size: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .movie-rating {
+        margin-bottom: 0.8rem;
+    }
+
+    .star {
+        font-size: 0.9rem;
+    }
+
+    .rating-text {
+        font-size: 0.85rem;
+    }
+
+    .movie-price {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .price-label {
+        font-size: 0.75rem;
+    }
+
+    .book-btn {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .footer {
+        padding: 2.5rem 5% 1.5rem;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    .footer-brand {
+        grid-column: auto;
+    }
+
+    .footer-brand .footer-logo img {
+        height: 30px;
+    }
+
+    .footer-brand .footer-logo h3 {
+        font-size: 1.4rem;
+    }
+
+    .footer-description {
+        font-size: 0.85rem;
+    }
+
+    .footer-col h4 {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .footer-col ul li a,
+    .contact-info li {
+        font-size: 0.85rem;
+    }
+
+    .social-links a {
+        width: 36px;
+        height: 36px;
+    }
+
+    .social-icon {
+        font-size: 1rem;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.8rem;
+        padding-top: 1rem;
+    }
+
+    .footer-bottom p {
+        font-size: 0.8rem;
+    }
+
+    .footer-links {
+        justify-content: center;
+        gap: 0.6rem;
+    }
+
+    .footer-links a {
+        font-size: 0.8rem;
+    }
+}
+
+/* Small Tablets */
+@media (max-width: 640px) {
+    .movies-grid {
+        gap: 0.9rem;
+    }
+
+    .movie-title-text {
+        font-size: 0.95rem;
+    }
+
+    .movie-price {
+        font-size: 1.2rem;
+    }
+}
+
+/* Large Mobile */
+@media (max-width: 576px) {
+    nav {
+        padding: 0.8rem 4%;
+    }
+
+    .logo span {
+        font-size: 1.1rem;
+    }
+
+    .logo img {
+        height: 30px;
+    }
+
+    .movies-hero {
+        min-height: 280px;
+    }
+
+    .movies-title {
+        font-size: 2.2rem;
+    }
+
+    .movies-subtitle {
+        font-size: 1rem;
+    }
+
+    .movies-section {
+        padding: 2.5rem 4%;
+    }
+
+    .movies-grid {
+        gap: 0.8rem;
+    }
+
+    .movie-info {
+        padding: 1rem;
+    }
+
+    .movie-title-text {
+        font-size: 0.95rem;
+    }
+
+    .footer {
+        padding: 2rem 4% 1.5rem;
+    }
+}
+
+/* Standard Mobile */
+@media (max-width: 480px) {
+    nav {
+        padding: 0.7rem 4%;
+    }
+
+    .logo {
+        gap: 0.5rem;
+    }
+
+    .logo span {
+        font-size: 1rem;
+    }
+
+    .logo img {
+        height: 28px;
+    }
+
+    .hamburger span {
+        width: 25px;
+        height: 2.5px;
+    }
+
+    .movies-hero {
+        min-height: 200px;
+        height: 30vh;
+    }
+
+    .movies-title {
+        font-size: 2rem;
+        padding: 0 0.5rem;
+    }
+
+    .movies-subtitle {
+        font-size: 0.95rem;
+        padding: 0 0.5rem;
+    }
+
+    .movies-section {
+        padding: 1.5rem 3%;
+    }
+
+    .movies-grid {
+        gap: 0.6rem;
+    }
+
+    .movie-card {
+        border-radius: 12px;
+    }
+
+    .movie-poster {
+        padding-top: 140%;
+    }
+
+    .movie-badge {
+        top: 6px;
+        right: 6px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.55rem;
+        border-radius: 12px;
+    }
+
+    .movie-info {
+        padding: 0.7rem;
+    }
+
+    .movie-title-text {
+        font-size: 0.85rem;
+        margin-bottom: 0.3rem;
+        line-height: 1.2;
+    }
+
+    .movie-meta {
+        font-size: 0.6rem;
+        gap: 0.4rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .movie-genre {
+        font-size: 0.65rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .movie-rating {
+        margin-bottom: 0.5rem;
+        gap: 0.15rem;
+    }
+
+    .star {
+        font-size: 0.7rem;
+    }
+
+    .rating-text {
+        font-size: 0.65rem;
+        margin-left: 0.15rem;
+    }
+
+    .movie-price {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .price-label {
+        font-size: 0.6rem;
+    }
+
+    .book-btn {
+        padding: 0.6rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.5px;
+        border-radius: 8px;
+    }
+
+    .footer {
+        padding: 2rem 4% 1.2rem;
+    }
+
+    .footer-top {
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+
+    .footer-brand .footer-logo img {
+        height: 28px;
+    }
+
+    .footer-brand .footer-logo h3 {
+        font-size: 1.3rem;
+    }
+
+    .footer-description {
+        font-size: 0.8rem;
+        line-height: 1.6;
+    }
+
+    .footer-col h4 {
+        font-size: 0.95rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .footer-col ul li {
+        margin-bottom: 0.6rem;
+    }
+
+    .footer-col ul li a,
+    .contact-info li {
+        font-size: 0.8rem;
+    }
+
+    .social-links {
+        gap: 0.6rem;
+    }
+
+    .social-links a {
+        width: 34px;
+        height: 34px;
+    }
+
+    .social-icon {
+        font-size: 0.95rem;
+    }
+
+    .footer-bottom p {
+        font-size: 0.75rem;
+    }
+
+    .footer-links a {
+        font-size: 0.75rem;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 375px) {
+    nav {
+        padding: 0.7rem 3%;
+    }
+
+    .logo span {
+        font-size: 0.95rem;
+    }
+
+    .logo img {
+        height: 26px;
+    }
+
+    .nav-links {
+        width: 80%;
+    }
+
+    .movies-hero {
+        min-height: 230px;
+    }
+
+    .movies-title {
+        font-size: 1.8rem;
+    }
+
+    .movies-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .movies-section {
+        padding: 1.8rem 3%;
+    }
+
+    .movies-grid {
+        gap: 0.6rem;
+    }
+
+    .movie-badge {
+        top: 6px;
+        right: 6px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.6rem;
+    }
+
+    .movie-info {
+        padding: 0.8rem;
+    }
+
+    .movie-title-text {
+        font-size: 0.85rem;
+    }
+
+    .movie-meta {
+        font-size: 0.65rem;
+        gap: 0.4rem;
+    }
+
+    .movie-genre {
+        font-size: 0.7rem;
+    }
+
+    .star {
+        font-size: 0.8rem;
+    }
+
+    .rating-text {
+        font-size: 0.75rem;
+    }
+
+    .movie-price {
+        font-size: 1rem;
+    }
+
+    .price-label {
+        font-size: 0.65rem;
+    }
+
+    .book-btn {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .footer {
+        padding: 1.8rem 3% 1rem;
+    }
+
+    .footer-brand .footer-logo img {
+        height: 26px;
+    }
+
+    .footer-brand .footer-logo h3 {
+        font-size: 1.2rem;
+    }
+
+    .social-links a {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 320px) {
+    nav {
+        padding: 0.6rem 3%;
+    }
+
+    .logo span {
+        font-size: 0.9rem;
+    }
+
+    .logo img {
+        height: 24px;
+    }
+
+    .hamburger span {
+        width: 22px;
+        height: 2px;
+    }
+
+    .nav-links {
+        width: 85%;
+        padding: 1.5rem;
+    }
+
+    .movies-hero {
+        min-height: 220px;
+    }
+
+    .movies-title {
+        font-size: 1.6rem;
+    }
+
+    .movies-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .movies-section {
+        padding: 1.5rem 3%;
+    }
+
+    .movies-grid {
+        gap: 0.5rem;
+    }
+
+    .movie-badge {
+        top: 5px;
+        right: 5px;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.55rem;
+    }
+
+    .movie-info {
+        padding: 0.7rem;
+    }
+
+    .movie-title-text {
+        font-size: 0.8rem;
+    }
+
+    .movie-meta {
+        font-size: 0.6rem;
+        gap: 0.3rem;
+    }
+
+    .movie-genre {
+        font-size: 0.65rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .movie-rating {
+        margin-bottom: 0.6rem;
+    }
+
+    .star {
+        font-size: 0.75rem;
+    }
+
+    .rating-text {
+        font-size: 0.7rem;
+    }
+
+    .movie-price {
+        font-size: 0.95rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .price-label {
+        font-size: 0.6rem;
+    }
+
+    .book-btn {
+        padding: 0.55rem;
+        font-size: 0.75rem;
+    }
+
+    .footer {
+        padding: 1.5rem 3% 1rem;
+    }
+
+    .footer-top {
+        gap: 1.2rem;
+        margin-bottom: 1.2rem;
+        padding-bottom: 1.2rem;
+    }
+
+    .footer-brand .footer-logo img {
+        height: 24px;
+    }
+
+    .footer-brand .footer-logo h3 {
+        font-size: 1.1rem;
+    }
+
+    .footer-description {
+        font-size: 0.75rem;
+    }
+
+    .footer-col h4 {
+        font-size: 0.9rem;
+    }
+
+    .footer-col ul li a,
+    .contact-info li {
+        font-size: 0.75rem;
+    }
+
+    .social-links a {
+        width: 30px;
+        height: 30px;
+    }
+
+    .social-icon {
+        font-size: 0.9rem;
+    }
+
+    .footer-bottom p,
+    .footer-links a {
+        font-size: 0.7rem;
+    }
+}
+
+/* Landscape Mobile Optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+    .movies-hero {
+        min-height: 100vh;
+        height: auto;
+        padding: 2rem 0;
+    }
+
+    .movies-title {
+        font-size: 2rem;
+    }
+
+    .movies-subtitle {
+        font-size: 1rem;
+    }
+
+    nav {
+        padding: 0.6rem 5%;
+    }
+
+    .logo img {
+        height: 28px;
+    }
+
+    .logo span {
+        font-size: 1.1rem;
+    }
+
+    .nav-links {
+        width: 50%;
+        max-width: 400px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .movie-card:active {
+        transform: translateY(-10px);
+    }
+
+    .book-btn:active {
+        transform: translateY(-1px);
+    }
+
+    .nav-links li a {
+        padding: 1rem;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hamburger {
+        padding: 0.5rem;
+        margin: -0.5rem;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .social-links a {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+.movie-card img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+/* Ticket quantity modal */
+.ticket-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+  z-index: 1100;
+}
+
+.ticket-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ticket-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+  z-index: 1101;
+  pointer-events: none;
+}
+
+.ticket-modal.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.ticket-modal-content {
+  width: min(92%, 480px);
+  background: linear-gradient(145deg, rgba(20, 20, 20, 0.94), rgba(12, 12, 12, 0.96));
+  border-radius: 28px;
+  padding: 2.4rem 2.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 32px 68px rgba(0, 0, 0, 0.55);
+  position: relative;
+  transform: translateY(20px);
+  animation: modalPop 0.32s ease forwards;
+  backdrop-filter: blur(18px);
+}
+
+.ticket-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.ticket-close:hover {
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.ticket-modal h3 {
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.modal-screen-label {
+  font-size: 0.9rem;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 1.8rem;
+}
+
+.ticket-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  padding: 0.75rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.counter-btn {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.counter-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.ticket-count {
+  font-size: 1.6rem;
+  font-weight: 700;
+  min-width: 38px;
+  text-align: center;
+  color: #fff;
+}
+
+.ticket-helper {
+  margin-top: 1.4rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ticket-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.8rem;
+}
+
+.primary-btn,
+.secondary-btn {
+  border: none;
+  outline: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ff9472);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(255, 107, 107, 0.35);
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(255, 107, 107, 0.45);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.ticket-note {
+  margin-top: 1rem;
+  text-align: right;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .ticket-modal {
+    align-items: flex-end;
+    padding: 1.5rem;
+  }
+
+  .ticket-modal-content {
+    width: 100%;
+    max-width: 480px;
+    border-radius: 24px 24px 0 0;
+    padding: 2rem 1.6rem 2.4rem;
+  }
+
+  .ticket-modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .ticket-note {
+    text-align: center;
+  }
+}

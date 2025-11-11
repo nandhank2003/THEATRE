@@ -1,0 +1,49 @@
+{
+  "name": "theatre-booking",
+  "version": "1.0.0",
+  "description": "Multiplex theatre booking system with admin panel, movie uploads, and ticket management.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env server.js",
+    "dev": "nodemon --env-file=.env server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^1.41.0",
+    "cors": "^2.8.5",
+    "detect-port": "^2.1.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "express-session": "^1.18.0",
+    "passport": "^0.7.0",
+    "mongoose": "^8.3.3",
+    "morgan": "^1.10.1",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^7.0.10",
+    "qrcode": "^1.5.4",
+    "razorpay": "^2.9.6",
+    "passport-google-oauth20": "^2.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "theatre",
+    "cinema",
+    "booking",
+    "movies",
+    "admin-dashboard",
+    "cloudinary",
+    "express",
+    "mongodb"
+  ],
+  "author": "Nandhan K",
+  "license": "MIT"
+}

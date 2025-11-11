@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - CineFlick</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/booking/booking.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="booking-navbar">
+        <a class="brand" href="/index.html">
+            <img src="/asset/Logo.png" alt="CineFlick logo" onerror="this.style.display='none'">
+            <span>CineFlick</span>
+        </a>
+        <div class="nav-links">
+            <a href="/index.html">Home</a>
+            <a href="/movies/movies.html">Movies</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="booking-main">
+        <div class="booking-container">
+            <header class="booking-header">
+                <h1>My Bookings</h1>
+                <p>View all your confirmed movie tickets</p>
+            </header>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All Tickets</button>
+                <button class="filter-tab" data-filter="confirmed">Confirmed</button>
+                <button class="filter-tab" data-filter="pending">Pending</button>
+            </div>
+
+            <!-- Tickets Container -->
+            <div id="ticketsContainer" class="tickets-container">
+                <div class="tickets-loading">
+                    <div class="loader"></div>
+                    <p>Loading your tickets...</p>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state hidden">
+                <div class="empty-icon">🎬</div>
+                <h3>No Bookings Yet</h3>
+                <p>You haven't booked any tickets yet. Start booking your favorite movies!</p>
+                <a href="/movies/movies.html" class="cta-button">Browse Movies</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Ticket Modal (for QR code view) -->
+    <div id="ticketModal" class="ticket-modal hidden">
+        <div class="modal-backdrop" onclick="closeTicketModal()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeTicketModal()">&times;</button>
+            <div id="modalTicketContent"></div>
+        </div>
+    </div>
+
+    <script src="/booking/booking.js"></script>
+</body>
+</html>
+
+
+
+

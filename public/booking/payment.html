@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - MALABAR CINEHUB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/booking/payment.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Header -->
+        <header class="payment-header">
+            <div class="logo-section">
+                <img src="/asset/Logo.png" alt="MALABAR CINEHUB" onerror="this.style.display='none'">
+                <span>MALABAR CINEHUB</span>
+            </div>
+            <a href="/movies/movies.html" class="back-link">← Back to Movies</a>
+        </header>
+
+        <div class="payment-content">
+            <div class="payment-main">
+                <!-- Booking Summary -->
+                <div class="summary-section">
+                    <h2>Booking Summary</h2>
+                    <div class="summary-details" id="bookingSummary">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="payment-method-section">
+                    <h2>Select Payment Method</h2>
+                    <div class="payment-methods">
+                        <label class="payment-option">
+                            <input type="radio" name="paymentMethod" value="razorpay" checked>
+                            <div class="payment-option-content">
+                                <div class="payment-icon">💳</div>
+                                <div>
+                                    <strong>Online Payment</strong>
+                                    <p>Pay securely with Razorpay (Cards, UPI, Netbanking, Wallets)</p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Payment Button -->
+                <div class="payment-actions">
+                    <button id="payNowBtn" class="pay-button">
+                        <span>Pay ₹<span id="totalAmountDisplay">0</span></span>
+                    </button>
+                    <p class="payment-note">Your seats are reserved for 10 minutes</p>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="payment-sidebar">
+                <div class="info-card">
+                    <h3>Need Help?</h3>
+                    <ul>
+                        <li>Seats are reserved for 10 minutes</li>
+                        <li>Complete payment to confirm booking</li>
+                        <li>You'll receive a confirmation email</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="paymentLoader" class="payment-loader hidden">
+            <div class="loader-spinner"></div>
+            <p>Processing payment...</p>
+        </div>
+    </div>
+
+    <script src="/booking/payment.js"></script>
+</body>
+</html>
+

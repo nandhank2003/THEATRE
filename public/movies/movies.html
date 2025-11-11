@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Now Showing - MALABAR CINEHUB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/movies/movies.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav id="navbar">
+        <div class="logo">
+            <img src="/asset/Logo.png" alt="MALABAR CINEHUB" onerror="this.style.display='none'">
+            <span>MALABAR CINEHUB</span>
+        </div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/about/about.html">About</a></li>
+            <li><a href="/movies/movies.html">Movies</a></li>
+            <li><a href="/contact/contact.html">Contact</a></li>
+        </ul>
+        <a href="/login-form/login.html" class="login-btn">Login</a>
+
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Movies Hero Section -->
+    <section class="movies-hero">
+        <div class="hero-overlay"></div>
+        <div class="movies-hero-content">
+            <h1 class="movies-title">Now Showing</h1>
+            <p class="movies-subtitle">Book your tickets for the latest blockbusters</p>
+        </div>
+    </section>
+
+    <!-- Movies Grid Section -->
+    <section class="movies-section" id="movies">
+        <div class="container">
+            <!-- Movie Cards Grid -->
+            <div class="movies-grid" id="moviesGrid">
+                <!-- Movies will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Ticket Quantity Modal -->
+    <div class="ticket-modal-backdrop" id="ticketModalBackdrop"></div>
+    <div class="ticket-modal" id="ticketModal">
+        <div class="ticket-modal-content">
+            <button class="ticket-close" id="ticketModalClose" aria-label="Close ticket selector">&times;</button>
+            <h3 id="modalMovieTitle">Book Tickets</h3>
+            <p class="modal-screen-label" id="modalScreenLabel"></p>
+            <div class="ticket-counter">
+                <button type="button" class="counter-btn" id="ticketDecrease" aria-label="Decrease tickets">−</button>
+                <span class="ticket-count" id="ticketCountDisplay">1</span>
+                <button type="button" class="counter-btn" id="ticketIncrease" aria-label="Increase tickets">+</button>
+            </div>
+            <p class="ticket-helper">How many tickets would you like to book?</p>
+            <div class="ticket-modal-actions">
+                <button type="button" class="secondary-btn" id="ticketCancelBtn">Cancel</button>
+                <button type="button" class="primary-btn" id="ticketConfirmBtn">Select Seats</button>
+            </div>
+            <p class="ticket-note">You can select up to 10 seats per booking.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Footer Top -->
+            <div class="footer-top">
+                <div class="footer-col footer-brand">
+                    <div class="footer-logo">
+                        <img src="/asset/Logo.png" alt="MALABAR CINEHUB" onerror="this.style.display='none'">
+                        <h3>MALABAR CINEHUB</h3>
+                    </div>
+                    <p class="footer-description">Your premium destination for the ultimate cinema experience. Book your seats and immerse yourself in the magic of movies.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="social-icon">f</i></a>
+                        <a href="#" aria-label="Twitter"><i class="social-icon">𝕏</i></a>
+                        <a href="#" aria-label="Instagram"><i class="social-icon">📷</i></a>
+                        <a href="#" aria-label="YouTube"><i class="social-icon">▶</i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#movies">Now Showing</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Experience</h4>
+                    <ul>
+                        <li><a href="#">IMAX</a></li>
+                        <li><a href="#">4DX</a></li>
+                        <li><a href="#">Dolby Atmos</a></li>
+                        <li><a href="#">Premium Seats</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Ticket Cancellation</a></li>
+                        <li><a href="#">Gift Cards</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul class="contact-info">
+                        <li>📍 Sharjah, UAE</li>
+                        <li>📞 +971 XX XXX XXXX</li>
+                        <li>✉️ info@MALABAR CINEHUB.com</li>
+                        <li>🕐 10:00 AM - 12:00 AM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p>&copy; 2025 MALABAR CINEHUB. All Rights Reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <span>•</span>
+                    <a href="#">Cookie Policy</a>
+                    <span>•</span>
+                    <a href="#">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/movies/movies.js"></script>
+</body>
+</html>

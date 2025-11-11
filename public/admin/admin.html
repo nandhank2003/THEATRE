@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Theatre Booking</title>
+  <link rel="stylesheet" href="/admin/admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="fas fa-film"></i>
+          <span>MALABAR CINEHUB Admin</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item active" data-section="dashboard">
+            <a href="#"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+          </li>
+          <li class="nav-item" data-section="movies">
+            <a href="#"><i class="fas fa-film"></i><span>Movies</span></a>
+          </li>
+          <li class="nav-item" data-section="users">
+            <a href="#"><i class="fas fa-users"></i><span>Users</span></a>
+          </li>
+          <li class="nav-item" data-section="payments">
+            <a href="#"><i class="fas fa-credit-card"></i><span>Payments</span></a>
+          </li>
+          <li class="nav-item" data-section="bookings">
+            <a href="#"><i class="fas fa-calendar-check"></i><span>Bookings</span></a>
+          </li>
+          <li class="nav-item" data-section="tickets">
+            <a href="#"><i class="fas fa-ticket-alt"></i><span>Tickets</span></a>
+          </li>
+          <li class="nav-item logout">
+            <a href="#"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="main-header">
+        <div class="header-left">
+          <h1>Admin Dashboard</h1>
+          <p>Welcome back, Admin</p>
+        </div>
+        <div class="header-right">
+          <div class="user-profile">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=6a11cb&color=fff" alt="Admin">
+            <span>Admin User</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="content-section active">
+        <div class="stats-grid">
+          <!-- Dynamic stats will be added via JS -->
+        </div>
+
+        <div class="recent-activity">
+          <h2>Recent Activity</h2>
+          <div class="activity-list" id="activityList">
+            <p style="color:#888;text-align:center;">No recent activity yet.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Movies Section -->
+      <section id="movies" class="content-section">
+        <div class="section-header">
+          <h2>Movie Management</h2>
+          <button class="btn btn-primary" id="addMovieBtn">
+            <i class="fas fa-plus"></i> Add New Movie
+          </button>
+        </div>
+
+        <!-- Add Movie Form -->
+        <div class="form-container glass-card" id="movieForm" style="display: none;">
+          <h3>Add New Movie</h3>
+          <form id="movieFormElement">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="movieTitle">Movie Title</label>
+                <input type="text" id="movieTitle" required>
+              </div>
+              <div class="form-group">
+                <label for="movieLanguage">Language</label>
+                <select id="movieLanguage" required>
+                  <option value="">Select Language</option>
+                  <option value="English">English</option>
+                  <option value="Hindi">Hindi</option>
+                  <option value="Tamil">Tamil</option>
+                  <option value="Telugu">Telugu</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="movieDuration">Duration (minutes)</label>
+                <input type="number" id="movieDuration" required>
+              </div>
+              <div class="form-group">
+                <label for="movieGenre">Genre</label>
+                <select id="movieGenre" required>
+                  <option value="">Select Genre</option>
+                  <option value="Action">Action</option>
+                  <option value="Comedy">Comedy</option>
+                  <option value="Drama">Drama</option>
+                  <option value="Horror">Horror</option>
+                  <option value="Sci-Fi">Sci-Fi</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="movieScreen">Screen</label>
+                <select id="movieScreen" required>
+                  <option value="">Loading screens...</option>
+                </select>
+                <small class="input-hint">Screens are pre-configured with seat layouts.</small>
+              </div>
+              <div class="form-group">
+                <label for="moviePrice">Ticket Price (₹)</label>
+                <input type="number" id="moviePrice" required>
+              </div>
+            </div>
+            <div class="form-group full-width">
+              <label for="movieDescription">Description</label>
+              <textarea id="movieDescription" rows="3" required></textarea>
+            </div>
+            <div class="form-group full-width">
+              <label for="movieShowtimes">Show Timings (comma separated)</label>
+              <input type="text" id="movieShowtimes" placeholder="e.g., 10:00 AM, 1:30 PM, 6:00 PM" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="moviePoster">Movie Poster</label>
+              <div class="file-upload">
+                <input type="file" id="moviePoster" accept="image/*" required>
+                <div class="file-upload-preview" id="posterPreview">
+                  <i class="fas fa-image"></i>
+                  <span>Click to upload poster</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="cancelMovieBtn">Cancel</button>
+              <button type="submit" class="btn btn-primary">Add Movie</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Movies List -->
+        <div class="movies-grid" id="moviesList">
+          <p style="color:#888;text-align:center;">🎬 No movies yet. Add one above!</p>
+        </div>
+      </section>
+
+      <!-- Users Section -->
+      <section id="users" class="content-section">
+        <div class="section-header">
+          <h2>User Management</h2>
+        </div>
+        <div class="table-container glass-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Date Registered</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="5" style="text-align:center;color:#888;">No users available.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Payments Section -->
+      <section id="payments" class="content-section">
+        <div class="section-header">
+          <h2>Payment Transactions</h2>
+        </div>
+        <div class="table-container glass-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Movie Name</th>
+                <th>User</th>
+                <th>Amount</th>
+                <th>Payment ID</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="paymentsTableBody">
+              <tr><td colspan="6" style="text-align:center;color:#888;">No payment records yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Bookings Section -->
+      <section id="bookings" class="content-section">
+        <div class="section-header">
+          <h2>Booking Management</h2>
+        </div>
+        <div class="table-container glass-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Movie</th>
+                <th>Screen</th>
+                <th>Seats</th>
+                <th>Show Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTableBody">
+              <tr><td colspan="7" style="text-align:center;color:#888;">No bookings yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Tickets Section -->
+      <section id="tickets" class="content-section">
+        <div class="section-header">
+          <h2>Ticket Management</h2>
+        </div>
+        <div class="tickets-grid" id="ticketsList">
+          <p style="color:#888;text-align:center;">No tickets found.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Ticket Modal -->
+  <div class="modal" id="ticketModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3>Ticket Details</h3>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body" id="ticketModalBody">
+        <p style="color:#888;text-align:center;">No ticket selected.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="closeModalBtn">Close</button>
+        <button class="btn btn-primary" id="downloadTicketBtn">
+          <i class="fas fa-download"></i> Download Ticket
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

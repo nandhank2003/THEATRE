@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seat Selection • MALABAR CINEHUB</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/booking/seat-selection.css" />
+  </head>
+  <body>
+    <nav class="booking-navbar">
+      <a class="brand" href="/index.html">
+        <img src="/asset/Logo.png" alt="MALABAR CINEHUB logo" />
+        <span>MALABAR CINEHUB</span>
+      </a>
+      <a class="back-link" href="/movies/movies.html">
+        <span aria-hidden="true">←</span> Back to Movies
+      </a>
+    </nav>
+
+    <main class="booking-layout">
+      <section class="booking-content">
+        <header class="movie-header">
+          <h1 id="movieTitle">Loading movie...</h1>
+          <p id="screenLabel" class="screen-label"></p>
+          <p id="ticketInfo" class="ticket-info"></p>
+        </header>
+
+        <div class="seat-legend">
+          <span class="legend-item">
+            <span class="seat-dot preferred"></span> Preferred (+₹1)
+          </span>
+          <span class="legend-item">
+            <span class="seat-dot standard"></span> Standard
+          </span>
+          <span class="legend-item">
+            <span class="seat-dot value"></span> Value (-₹2)
+          </span>
+          <span class="legend-item">
+            <span class="seat-dot premium"></span> Premium
+          </span>
+          <span class="legend-item">
+            <span class="seat-dot wheelchair"></span> Wheelchair
+          </span>
+          <span class="legend-item">
+            <span class="seat-dot selected"></span> Selected
+          </span>
+          <span class="legend-item">
+            <span class="seat-dot booked"></span> Booked
+          </span>
+        </div>
+
+        <div class="seat-grid-wrapper">
+          <div class="screen-indicator">Screen This Way</div>
+          <div id="seatGrid" class="seat-grid" aria-live="polite"></div>
+        </div>
+
+        <div id="bookingFeedback" class="booking-feedback" role="status"></div>
+      </section>
+
+      <aside class="booking-sidebar">
+        <div class="summary-card">
+          <h2>Booking Summary</h2>
+          <div class="summary-row">
+            <span>Tickets</span>
+            <strong id="summaryTicketCount">0</strong>
+          </div>
+          <div class="summary-row seats-row">
+            <span>Seats</span>
+            <div id="selectedSeatsList" class="selected-seats">None selected</div>
+          </div>
+          <div class="summary-row">
+            <span>Price / Seat</span>
+            <strong id="summaryPrice">₹0</strong>
+          </div>
+          <div class="summary-total">
+            <span>Total Amount</span>
+            <strong id="summaryTotal">₹0</strong>
+          </div>
+
+          <button id="confirmBookingBtn" class="cta-button">
+            Confirm Booking
+          </button>
+          <button id="changeMovieBtn" class="ghost-button">
+            Change Movie
+          </button>
+        </div>
+
+        <div class="tips-card">
+          <h3>Need Help?</h3>
+          <ul>
+            <li>You can select seats equal to your ticket count.</li>
+            <li>Premium seats are highlighted in gold.</li>
+            <li>Booked seats appear as unavailable.</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <div class="login-prompt hidden" id="loginPrompt">
+      <div class="login-card">
+        <h3>Login Required</h3>
+        <p>Please log in to complete your booking.</p>
+        <div class="login-actions">
+          <button id="loginCancelBtn" class="ghost-button">Maybe Later</button>
+          <a href="/login-form/login.html" class="cta-button">Go to Login</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-loader hidden" id="pageLoader">
+      <div class="spinner"></div>
+      <p>Fetching live seat availability...</p>
+    </div>
+
+    <script src="/booking/seat-selection.js" type="module"></script>
+  </body>
+</html>
+
