@@ -11,14 +11,14 @@ export const sendOTPEmail = async (email, otp) => {
   }
 
   try {
-    // ✅ Gmail SMTP setup (App Password required)
+    // ✅ Use Nodemailer with Port 465 (SSL) for better reliability on cloud platforms
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587, // ✅ Use port 587 for STARTTLS
-      secure: false, // `secure: false` is required for STARTTLS
+      port: 465,
+      secure: true, // true for 465, false for other ports
       auth: {
         user: process.env.EMAIL_USER, // Your Gmail address
-        pass: process.env.EMAIL_PASS, // App Password (not your normal password)
+        pass: process.env.EMAIL_PASS, // Your Gmail App Password
       },
     });
 
@@ -45,7 +45,7 @@ export const sendOTPEmail = async (email, otp) => {
     await transporter.sendMail(mailOptions);
     console.log(`✅ OTP email sent successfully to ${email}`);
   } catch (error) {
-    console.error("❌ Nodemailer Error: Failed to send OTP email.", error);
+    console.error("❌ Nodemailer Error (Port 465): Failed to send OTP email.", error);
     console.error("💡 Tip: Ensure EMAIL_USER and EMAIL_PASS (App Password) are correct in Render and that 2FA is enabled on the Google account.");
     throw error; // Re-throw the error to be handled by the caller
   }

@@ -24,21 +24,21 @@ router.post("/", async (req, res) => {
     return res.status(200).json({ isAdminRedirect: true });
   }
 
-  // --- Nodemailer Email Sending Logic ---
+  // --- Nodemailer Email Sending Logic (Port 465) ---
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // Use STARTTLS
+    port: 465,
+    secure: true, // Use SSL
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
-    }
+    },
   });
 
   const mailOptions = {
-    from: `"${firstName} ${lastName}" <${email}>`,
+    from: `"${firstName} ${lastName}" <${process.env.EMAIL_USER}>`, // Send from your verified email
     to: process.env.CONTACT_EMAIL_RECIPIENT,
-    replyTo: email,
+    replyTo: email, // Set the user's email as the reply-to address
     subject: `New Contact Form Message: ${subject}`,
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">

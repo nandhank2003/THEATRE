@@ -12,8 +12,8 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // Use STARTTLS
+      port: 465,
+      secure: true, // Use SSL
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -113,8 +113,7 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
     console.log(`✅ Ticket email sent successfully to ${user.email}`);
     return true;
   } catch (error) {
-    console.error("❌ Nodemailer Error: Failed to send ticket email.", error);
-    console.error("💡 Tip: Ensure EMAIL_USER and EMAIL_PASS (App Password) are correct in Render and that 2FA is enabled on the Google account.");
+    console.error("❌ Nodemailer Error (Port 465): Failed to send ticket email.", error);
     return false; // Do not break booking if email fails
   }
 };
