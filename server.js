@@ -1,6 +1,10 @@
 // 🎬 THEATRE BOOKING SERVER (Render + Local Ready)
 // Backend for movie upload, ticket booking, and user management
 
+// Load environment variables from .env file
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -15,7 +19,7 @@ import Screen from "./models/Screen.js";
 import configurePassport from "./config/passport.js";
 
 import movieRoutes from "./routes/movieRoutes.js";
-import uploadRoutes from "./routes/uploadRoutes.js";
+// import uploadRoutes from "./routes/uploadRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -153,7 +157,7 @@ try {
 // 🔗 API Routes
 // ===============================
 app.use("/api/movies", movieRoutes);
-app.use("/api/uploads", uploadRoutes);
+// app.use("/api/uploads", uploadRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/screens", screenRoutes);
