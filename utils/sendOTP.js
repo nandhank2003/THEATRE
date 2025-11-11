@@ -2,6 +2,14 @@
 import nodemailer from "nodemailer";
 
 export const sendOTPEmail = async (email, otp) => {
+  // --- Production Safety Check ---
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("❌ Missing EMAIL_USER or EMAIL_PASS in environment variables.");
+    console.log("📧 OTP Email not sent. Check Render environment configuration.");
+    // In a real app, you might want to return an error or handle this differently
+    return;
+  }
+
   try {
     // ✅ Gmail SMTP setup (App Password required)
     const transporter = nodemailer.createTransport({
@@ -42,6 +50,7 @@ export const sendOTPEmail = async (email, otp) => {
     await transporter.sendMail(mailOptions);
     console.log(`✅ OTP email sent successfully to ${email}`);
   } catch (error) {
-    console.error("❌ Error sending OTP email:", error);
+    console.error("❌ Nodemailer Error: Failed to send OTP email.", error);
+    console.error("💡 Tip: Ensure EMAIL_USER and EMAIL_PASS (App Password) are correct in Render and that 2FA is enabled on the Google account.");
   }
 };

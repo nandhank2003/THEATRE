@@ -2,6 +2,13 @@
 import nodemailer from "nodemailer";
 
 export const sendTicketEmail = async (user, booking, ticketData) => {
+  // --- Production Safety Check ---
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("❌ Missing EMAIL_USER or EMAIL_PASS in environment variables.");
+    console.log("📧 Ticket Email not sent. Check Render environment configuration.");
+    return false;
+  }
+
   try {
     // ✅ Use explicit SMTP config instead of service: "gmail" (Render safe)
     const transporter = nodemailer.createTransport({
@@ -111,7 +118,8 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
     console.log(`✅ Ticket email sent successfully to ${user.email}`);
     return true;
   } catch (error) {
-    console.error("❌ Error sending ticket email:", error);
+    console.error("❌ Nodemailer Error: Failed to send ticket email.", error);
+    console.error("💡 Tip: Ensure EMAIL_USER and EMAIL_PASS (App Password) are correct in Render and that 2FA is enabled on the Google account.");
     return false; // Do not break booking if email fails
   }
 };
