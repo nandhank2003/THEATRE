@@ -176,6 +176,21 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "✅ Server Running", time: new Date() });
 });
 
+// ✅ Add a debug route to check environment variables on Render
+app.get("/api/debug/env", (req, res) => {
+  // IMPORTANT: Protect this route in a real production app
+  // For now, it helps diagnose deployment issues.
+  res.json({
+    NODE_ENV: process.env.NODE_ENV,
+    MONGO_URI_LOADED: !!process.env.MONGO_URI,
+    JWT_SECRET_LOADED: !!process.env.JWT_SECRET,
+    SESSION_SECRET_LOADED: !!process.env.SESSION_SECRET,
+    EMAIL_USER_LOADED: !!process.env.EMAIL_USER,
+    EMAIL_PASS_LOADED: !!process.env.EMAIL_PASS,
+    SENDGRID_API_KEY_LOADED: !!process.env.SENDGRID_API_KEY,
+  });
+});
+
 // 404 for API routes
 app.use("/api", (req, res) => {
   res.status(404).json({
