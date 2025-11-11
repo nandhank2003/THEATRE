@@ -64,6 +64,7 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "https:"],
+        scriptSrcAttr: ["'unsafe-inline'"], // ✅ allows inline event handlers
         styleSrc: ["'self'", "'unsafe-inline'", "https:"],
         fontSrc: ["'self'", "https:"],
         imgSrc: [
@@ -79,6 +80,7 @@ app.use(
           "http://localhost:5000",
           "https://malabarcinehub.onrender.com",
           "https://theatre.onrender.com",
+          "https://theatre-1-err2.onrender.com", // ✅ Added your live Render domain
         ],
         frameSrc: ["'self'", "https:"],
         objectSrc: ["'none'"],
@@ -92,11 +94,13 @@ app.use(
 // ===============================
 app.use(morgan("dev"));
 
+// ✅ Allow Local + Render Frontend
 const allowedOrigins = [
   "http://localhost:5000",
   "http://127.0.0.1:5000",
   "https://malabarcinehub.onrender.com",
   "https://theatre.onrender.com",
+  "https://theatre-1-err2.onrender.com", // ✅ added your deployed frontend
 ];
 
 app.use(
@@ -105,7 +109,7 @@ app.use(
       if (!origin) return callback(null, true);
       if (!allowedOrigins.includes(origin)) {
         return callback(
-          new Error(`Blocked by CORS: ${origin} not allowed.`),
+          new Error(`🚫 Blocked by CORS: ${origin} not allowed.`),
           false
         );
       }
@@ -175,7 +179,7 @@ app.use("/api", (req, res) => {
   });
 });
 
-// Serve frontend (for React/HTML single-page apps)
+// Serve frontend (for HTML/SPA)
 app.get("*", (req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));
 });
