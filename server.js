@@ -187,7 +187,6 @@ app.get("/api/debug/env", (req, res) => {
     SESSION_SECRET_LOADED: !!process.env.SESSION_SECRET,
     EMAIL_USER_LOADED: !!process.env.EMAIL_USER,
     EMAIL_PASS_LOADED: !!process.env.EMAIL_PASS,
-    SENDGRID_API_KEY_LOADED: !!process.env.SENDGRID_API_KEY,
   });
 });
 

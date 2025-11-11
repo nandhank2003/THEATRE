@@ -1,17 +1,25 @@
 // utils/sendTicketEmail.js
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 
 export const sendTicketEmail = async (user, booking, ticketData) => {
   // --- Production Safety Check ---
-  if (!process.env.SENDGRID_API_KEY || !process.env.EMAIL_USER) {
-    console.error("❌ Missing SENDGRID_API_KEY or EMAIL_USER in environment variables.");
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("❌ Missing EMAIL_USER or EMAIL_PASS in environment variables.");
     console.log("📧 Ticket Email not sent. Check Render environment configuration.");
     return false;
   }
 
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
   try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // Use STARTTLS
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
     const bookingDate = new Date(booking.bookingTime);
     const formattedDate = bookingDate.toLocaleDateString("en-IN", {
       weekday: "long",
@@ -94,21 +102,19 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
 </body>
 </html>`;
 
-    const msg = {
+    const mailOptions = {
+      from: `"MALABAR CINEHUB" <${process.env.EMAIL_USER}>`,
       to: user.email,
-      from: {
-        name: "MALABAR CINEHUB",
-        email: process.env.EMAIL_USER, // Use a verified sender email in SendGrid
-      },
       subject: `🎫 Your MALABAR CINEHUB Ticket - ${booking.movie?.title || "Movie"}`,
       html: emailHTML,
     };
 
-    await sgMail.send(msg);
+    await transporter.sendMail(mailOptions);
     console.log(`✅ Ticket email sent successfully to ${user.email}`);
     return true;
   } catch (error) {
-    console.error("❌ SendGrid Error: Failed to send ticket email.", error);
+    console.error("❌ Nodemailer Error: Failed to send ticket email.", error);
+    console.error("💡 Tip: Ensure EMAIL_USER and EMAIL_PASS (App Password) are correct in Render and that 2FA is enabled on the Google account.");
     return false; // Do not break booking if email fails
   }
 };

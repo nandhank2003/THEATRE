@@ -1,25 +1,31 @@
 // utils/sendOTP.js
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 
 export const sendOTPEmail = async (email, otp) => {
   // --- Production Safety Check ---
-  if (!process.env.SENDGRID_API_KEY || !process.env.EMAIL_USER) {
-    console.error("❌ Missing SENDGRID_API_KEY or EMAIL_USER in environment variables.");
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("❌ Missing EMAIL_USER or EMAIL_PASS in environment variables.");
     console.log("📧 OTP Email not sent. Check Render environment configuration.");
     // Throw an error to be caught by the route handler
     throw new Error("Email service is not configured.");
   }
 
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
   try {
-    // ✅ OTP Email HTML Template
-    const msg = {
-      to: email,
-      from: {
-        name: "MALABAR CINEHUB Verification",
-        email: process.env.EMAIL_USER, // Use a verified sender email in SendGrid
+    // ✅ Gmail SMTP setup (App Password required)
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587, // ✅ Use port 587 for STARTTLS
+      secure: false, // `secure: false` is required for STARTTLS
+      auth: {
+        user: process.env.EMAIL_USER, // Your Gmail address
+        pass: process.env.EMAIL_PASS, // App Password (not your normal password)
       },
+    });
+
+    // ✅ OTP Email HTML Template
+    const mailOptions = {
+      from: `"MALABAR CINEHUB Verification" <${process.env.EMAIL_USER}>`,
+      to: email,
       subject: "🎬 MALABAR CINEHUB - Verify Your Email",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 20px; border-radius: 10px; background: #0b0b0b; color: #fff; border: 1px solid #222;">
@@ -36,13 +42,11 @@ export const sendOTPEmail = async (email, otp) => {
       `,
     };
 
-    await sgMail.send(msg);
+    await transporter.sendMail(mailOptions);
     console.log(`✅ OTP email sent successfully to ${email}`);
   } catch (error) {
-    console.error("❌ SendGrid Error: Failed to send OTP email.", error);
-    if (error.response) {
-      console.error(error.response.body);
-    }
+    console.error("❌ Nodemailer Error: Failed to send OTP email.", error);
+    console.error("💡 Tip: Ensure EMAIL_USER and EMAIL_PASS (App Password) are correct in Render and that 2FA is enabled on the Google account.");
     throw error; // Re-throw the error to be handled by the caller
   }
 };
