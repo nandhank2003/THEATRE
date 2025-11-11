@@ -4,10 +4,7 @@ import User from "../models/User.js"; // Assuming you have a User model
 
 const configurePassport = () => {
   // Determine the callback URL based on the environment
-  const callbackURL =
-    process.env.NODE_ENV === "production"
-      ? "https://malabarcinehub.onrender.com/auth/google/callback"
-      : "http://localhost:5000/auth/google/callback";
+  const callbackURL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:5000/auth/google/callback";
 
   passport.use(
     new GoogleStrategy(

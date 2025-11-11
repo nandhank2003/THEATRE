@@ -70,11 +70,10 @@ app.use(
         ],
         connectSrc: [
           "'self'",
-          "https:",
-          "http://localhost:5000",
-          "https://malabarcinehub.onrender.com",
-          "https://theatre.onrender.com",
-          "https://theatre-1-err2.onrender.com", // ✅ Added your live Render domain
+          process.env.FRONTEND_URL, // Your live frontend URL
+          process.env.BACKEND_URL, // Your live backend URL
+          "http://localhost:5173", // Your local frontend for development
+          "http://localhost:5000", // Your local backend for development
         ],
         frameSrc: ["'self'", "https:"],
         objectSrc: ["'none'"],
@@ -87,14 +86,11 @@ app.use(
 // 🪵 Logger & CORS
 // ===============================
 app.use(morgan("dev"));
-
-// ✅ Allow Local + Render Frontend
 const allowedOrigins = [
-  "http://localhost:5000",
-  "http://127.0.0.1:5000",
-  "https://malabarcinehub.onrender.com",
-  "https://theatre.onrender.com",
-  "https://theatre-1-err2.onrender.com", // ✅ added your deployed frontend
+  process.env.FRONTEND_URL,
+  "http://localhost:5173", // Default for Vite/React dev
+  "http://localhost:3000", // Default for Create React App dev
+  "http://localhost:5000", // Your local backend
 ];
 
 app.use(
