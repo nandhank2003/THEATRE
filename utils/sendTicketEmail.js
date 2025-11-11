@@ -32,21 +32,21 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your MALABAR CINEHUB Ticket</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a0a0a;">
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
     <tr>
-      <td style="padding: 20px 0; text-align: center; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);">
-        <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; text-shadow: 0 0 20px rgba(255,255,255,0.3);">MALABAR CINEHUB</h1>
+      <td style="padding: 20px 0; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">🎬 MALABAR CINEHUB</h1>
       </td>
     </tr>
     <tr>
       <td style="padding: 40px 20px;">
-        <table role="presentation" style="max-width: 600px; margin: 0 auto; background: #1a1a1a; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.5); border: 1px solid #333333;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
           <!-- Header -->
           <tr>
-            <td style="padding: 30px; background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%); text-align: center;">
-              <h2 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">Booking Confirmed!</h2>
-              <p style="color: #b8b8b8; margin: 10px 0 0; font-size: 16px;">Your ticket is ready</p>
+            <td style="padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); text-align: center;">
+              <h2 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">🎫 Booking Confirmed!</h2>
+              <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px;">Your ticket is ready</p>
             </td>
           </tr>
           
@@ -55,8 +55,8 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
             <td style="padding: 30px; text-align: center;">
               <img src="${booking.movie?.poster || 'https://via.placeholder.com/300x450/667eea/ffffff?text=Movie'}" 
                    alt="${booking.movie?.title || 'Movie'}" 
-                   style="max-width: 200px; width: 100%; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
-              <h3 style="color: #ffffff; margin: 0 0 10px; font-size: 22px; font-weight: 600;">${booking.movie?.title || 'Movie'}</h3>
+                   style="max-width: 200px; width: 100%; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+              <h3 style="color: #333; margin: 0 0 10px; font-size: 22px; font-weight: 600;">${booking.movie?.title || 'Movie'}</h3>
             </td>
           </tr>
           
@@ -65,34 +65,34 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
             <td style="padding: 0 30px;">
               <table role="presentation" style="width: 100%; border-collapse: collapse;">
                 <tr>
-                  <td style="padding: 15px; border-bottom: 1px solid #333333;">
-                    <strong style="color: #b8b8b8; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Ticket ID</strong>
-                    <p style="margin: 5px 0 0; color: #ffffff; font-size: 16px; font-weight: 600;">${ticketData.ticketId || 'N/A'}</p>
+                  <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                    <strong style="color: #667eea; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Ticket ID</strong>
+                    <p style="margin: 5px 0 0; color: #333; font-size: 16px; font-weight: 600;">${ticketData.ticketId || 'N/A'}</p>
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding: 15px; border-bottom: 1px solid #333333;">
-                    <strong style="color: #b8b8b8; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Screen</strong>
-                    <p style="margin: 5px 0 0; color: #ffffff; font-size: 16px;">${booking.screen?.name || 'N/A'}</p>
+                  <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                    <strong style="color: #667eea; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Screen</strong>
+                    <p style="margin: 5px 0 0; color: #333; font-size: 16px;">${booking.screen?.name || 'N/A'}</p>
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding: 15px; border-bottom: 1px solid #333333;">
-                    <strong style="color: #b8b8b8; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Seats</strong>
-                    <p style="margin: 5px 0 0; color: #ffffff; font-size: 16px; font-weight: 600;">${booking.seats.join(", ")}</p>
+                  <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                    <strong style="color: #667eea; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Seats</strong>
+                    <p style="margin: 5px 0 0; color: #333; font-size: 16px; font-weight: 600;">${booking.seats.join(", ")}</p>
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding: 15px; border-bottom: 1px solid #333333;">
-                    <strong style="color: #b8b8b8; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Date & Time</strong>
-                    <p style="margin: 5px 0 0; color: #ffffff; font-size: 16px;">${formattedDate}</p>
-                    <p style="margin: 5px 0 0; color: #999999; font-size: 14px;">${formattedTime}</p>
+                  <td style="padding: 15px; border-bottom: 1px solid #eee;">
+                    <strong style="color: #667eea; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Date & Time</strong>
+                    <p style="margin: 5px 0 0; color: #333; font-size: 16px;">${formattedDate}</p>
+                    <p style="margin: 5px 0 0; color: #666; font-size: 14px;">${formattedTime}</p>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding: 15px;">
-                    <strong style="color: #b8b8b8; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Total Amount</strong>
-                    <p style="margin: 5px 0 0; color: #ffffff; font-size: 20px; font-weight: 700;">₹${booking.totalAmount.toLocaleString('en-IN')}</p>
+                    <strong style="color: #667eea; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Total Amount</strong>
+                    <p style="margin: 5px 0 0; color: #333; font-size: 20px; font-weight: 700;">₹${booking.totalAmount.toLocaleString('en-IN')}</p>
                   </td>
                 </tr>
               </table>
@@ -101,23 +101,23 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
           
           <!-- QR Code -->
           <tr>
-            <td style="padding: 30px; text-align: center; background: #0d0d0d;">
-              <p style="margin: 0 0 15px; color: #b8b8b8; font-size: 14px; font-weight: 600;">Scan this QR code at the entry</p>
+            <td style="padding: 30px; text-align: center; background: #f8f9fa;">
+              <p style="margin: 0 0 15px; color: #666; font-size: 14px; font-weight: 600;">Scan this QR code at the entry</p>
               <img src="${ticketData.qrCode}" 
                    alt="QR Code" 
-                   style="width: 200px; height: 200px; background: #ffffff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-              <p style="margin: 15px 0 0; color: #808080; font-size: 12px;">Present this QR code at the cinema for entry</p>
+                   style="width: 200px; height: 200px; background: #ffffff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <p style="margin: 15px 0 0; color: #999; font-size: 12px;">Present this QR code at the cinema for entry</p>
             </td>
           </tr>
           
           <!-- Footer -->
           <tr>
-            <td style="padding: 20px 30px; background: #0d0d0d; text-align: center; border-top: 1px solid #333333;">
-              <p style="margin: 0; color: #b8b8b8; font-size: 13px; line-height: 1.6;">
+            <td style="padding: 20px 30px; background: #f8f9fa; text-align: center; border-top: 1px solid #eee;">
+              <p style="margin: 0; color: #666; font-size: 13px; line-height: 1.6;">
                 <strong>Important:</strong> Please arrive at least 15 minutes before the show time.<br>
                 Keep this email handy or show the QR code from your account.
               </p>
-              <p style="margin: 15px 0 0; color: #666666; font-size: 12px;">
+              <p style="margin: 15px 0 0; color: #999; font-size: 12px;">
                 © ${new Date().getFullYear()} MALABAR CINEHUB. All rights reserved.
               </p>
             </td>
@@ -133,7 +133,7 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
     const mailOptions = {
       from: `"MALABAR CINEHUB" <${process.env.EMAIL_USER}>`,
       to: user.email,
-      subject: `Your MALABAR CINEHUB Ticket - ${booking.movie?.title || 'Movie'}`,
+      subject: `🎫 Your MALABAR CINEHUB Ticket - ${booking.movie?.title || 'Movie'}`,
       html: emailHTML,
     };
 
@@ -146,3 +146,7 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
     return false;
   }
 };
+
+
+
+
