@@ -13,8 +13,8 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
     // ✅ Use explicit SMTP config instead of service: "gmail" (Render safe)
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // true = use SSL
+      port: 587, // ✅ Use port 587 for STARTTLS
+      secure: false, // `secure: false` is required for STARTTLS
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,

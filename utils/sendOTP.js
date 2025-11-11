@@ -14,8 +14,8 @@ export const sendOTPEmail = async (email, otp) => {
     // ✅ Gmail SMTP setup (App Password required)
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // ✅ Use SSL for Gmail
+      port: 587, // ✅ Use port 587 for STARTTLS
+      secure: false, // `secure: false` is required for STARTTLS
       auth: {
         user: process.env.EMAIL_USER, // Your Gmail address
         pass: process.env.EMAIL_PASS, // App Password (not your normal password)
