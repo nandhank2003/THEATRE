@@ -148,5 +148,3 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
 };
 
 
-
-
