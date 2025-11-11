@@ -5,8 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node --env-file=.env server.js",
-    "dev": "nodemon --env-file=.env server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -16,18 +16,16 @@
     "detect-port": "^2.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "express-session": "^1.18.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "express-session": "^1.18.0",
+    "passport": "^0.7.0",
     "mongoose": "^8.3.3",
     "morgan": "^1.10.1",
-    "multer": "^1.4.5-lts.1",
-    "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^7.0.10",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
     "qrcode": "^1.5.4",
-    "razorpay": "^2.9.6"
+    "razorpay": "^2.9.6",
+    "passport-google-oauth20": "^2.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
