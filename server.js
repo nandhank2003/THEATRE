@@ -5,8 +5,6 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import fs from "fs";
-import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
 import session from "express-session";
@@ -27,23 +25,14 @@ import adminRoutes from "./routes/adminRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 
 // ===============================
-// 🧠 Reliable dotenv loader
+// 🧠 Environment Setup
 // ===============================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const envPath = path.join(__dirname, ".env");
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-  console.log("✅ .env file loaded successfully");
-} else {
-  console.warn("⚠️ .env file not found, using system environment variables");
-}
-
 // Validate env vars
 if (!process.env.MONGO_URI) console.error("❌ Missing MONGO_URI in .env");
 if (!process.env.JWT_SECRET) console.error("❌ Missing JWT_SECRET in .env");
-
 // Debug Info
 console.log("🧩 Mongo URI Loaded:", !!process.env.MONGO_URI);
 console.log("🧩 JWT Secret Loaded:", !!process.env.JWT_SECRET);
