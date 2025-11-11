@@ -94,7 +94,7 @@ const allowedOrigins = [
   "http://localhost:5173", // Default for Vite/React dev
   "http://localhost:3000", // Default for Create React App dev
   "http://localhost:5000", // Your local backend
-];
+].filter(Boolean); // ✅ Filter out any undefined/null entries
 
 app.use(
   cors({
