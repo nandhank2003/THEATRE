@@ -123,3 +123,4 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
     return false; // Do not break booking if email fails
   }
 };
+
