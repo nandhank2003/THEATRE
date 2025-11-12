@@ -11,6 +11,7 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^1.41.0",
+    "compression": "^1.8.1",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
     "detect-port": "^2.1.0",
