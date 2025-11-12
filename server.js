@@ -56,30 +56,27 @@ console.log("🧩 JWT Secret Loaded:", !!process.env.JWT_SECRET);
 // 5) App init
 // ------------------------------
 const app = express();
-
-// Render / proxies
 app.set("trust proxy", 1);
 
-// Configure Passport (your file may accept passport or not; keep as you had)
-try {
-  configurePassport(passport);
-} catch {
-  // fallback for your previous signature (no args)
-  try { configurePassport(); } catch {}
-}
+// ------------------------------
+// 6) Basic Middlewares (Simplified CORS for same-origin deployment)
+// ------------------------------
+app.use(
+  cors({
+    origin: true, // Automatically allows same-origin
+    credentials: true, // Enables cookies/sessions
+  })
+);
+app.options("*", cors());
+
+app.use(morgan("dev"));
+app.use(compression());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
 
 // ------------------------------
-// 6) Security headers (Helmet)
-//    CSP allows your local + render URLs, Cloudinary images, etc.
+// 7) Helmet Security
 // ------------------------------
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-const BACKEND_URL  = process.env.BACKEND_URL  || "";
-const RENDER_URLS  = [
-  "https://theatre-mrqa.onrender.com",    // Backend
-  "https://theatre-1-zlic.onrender.com",  // ✅ Your active frontend
-  "https://theatre-1-err2.onrender.com",  // Old frontend (optional)
-].filter(Boolean);
-
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
@@ -88,7 +85,6 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "https:"],
-        scriptSrcAttr: ["'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'", "https:"],
         fontSrc: ["'self'", "https:"],
         imgSrc: [
@@ -98,14 +94,7 @@ app.use(
           "https://res.cloudinary.com",
           "https://ui-avatars.com",
         ],
-        connectSrc: [
-          "'self'",
-          FRONTEND_URL,
-          BACKEND_URL,
-          ...RENDER_URLS,
-          "http://localhost:5173",
-          "http://localhost:5000",
-        ].filter(Boolean),
+        connectSrc: ["'self'", "https:"],
         frameSrc: ["'self'", "https:"],
         objectSrc: ["'none'"],
       },
@@ -114,42 +103,7 @@ app.use(
 );
 
 // ------------------------------
-// 7) Logging, compression, body parsers
-// ------------------------------
-app.use(morgan("dev"));
-app.use(compression());
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
-
-// ------------------------------
-// 8) CORS (allow your FE + local dev)
-// ------------------------------
-const allowedOrigins = [
-  FRONTEND_URL,
-  ...RENDER_URLS,
-  "http://localhost:5173",
-  "http://localhost:3000",
-  "http://localhost:5000",
-].filter(Boolean);
-
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      if (!allowedOrigins.includes(origin)) {
-        return cb(new Error(`🚫 CORS blocked: ${origin}`), false);
-      }
-      return cb(null, true);
-    },
-    credentials: true,
-  })
-);
-
-// Preflight helper
-app.options("*", cors());
-
-// ------------------------------
-// 9) Sessions (Mongo-backed)
+// 8) Sessions (Mongo-backed)
 // ------------------------------
 const isProd = process.env.NODE_ENV === "production";
 app.use(
@@ -165,23 +119,29 @@ app.use(
     }),
     cookie: {
       maxAge: 14 * 24 * 60 * 60 * 1000,
-      secure: isProd,                 
+      secure: isProd, // HTTPS only in production
       httpOnly: true,
-      sameSite: isProd ? "none" : "lax", 
-      domain: undefined,              
+      sameSite: isProd ? "none" : "lax",
     },
     proxy: true,
   })
 );
 
 // ------------------------------
-// 10) Passport
+// 9) Passport Config
 // ------------------------------
+try {
+  configurePassport(passport);
+} catch {
+  try {
+    configurePassport();
+  } catch {}
+}
 app.use(passport.initialize());
 app.use(passport.session());
 
 // ------------------------------
-// 11) DB connect + default screens
+// 10) Connect MongoDB
 // ------------------------------
 try {
   await connectDB();
@@ -195,7 +155,7 @@ try {
 }
 
 // ------------------------------
-// 12) API Routes
+// 11) API Routes
 // ------------------------------
 app.use("/api/movies", movieRoutes);
 app.use("/api/tickets", ticketRoutes);
@@ -207,21 +167,24 @@ app.use("/api/contact", contactRoutes);
 app.use("/auth", authRoutes);
 
 // ------------------------------
-// 13) Static / SPA
+// 12) Static / SPA
 // ------------------------------
 const publicPath = path.join(__dirname, "public");
 app.use(express.static(publicPath));
 
-// Health check
 app.get("/api/health", (req, res) => {
   res.json({ status: "✅ Server Running", time: new Date().toISOString() });
 });
 
-// Optional: Brevo SMTP verify endpoint
+// ------------------------------
+// 13) Brevo SMTP Verify Endpoint (Optional)
+// ------------------------------
 app.get("/api/health/email", async (req, res) => {
   try {
     if (!process.env.BREVO_HOST) {
-      return res.status(400).json({ ok: false, message: "BREVO_* env not set" });
+      return res
+        .status(400)
+        .json({ ok: false, message: "BREVO_* env not set" });
     }
     const transporter = nodemailer.createTransport({
       host: process.env.BREVO_HOST,
@@ -236,7 +199,9 @@ app.get("/api/health/email", async (req, res) => {
   }
 });
 
-// Debug (temporary)
+// ------------------------------
+// 14) Debug & Fallback Routes
+// ------------------------------
 app.get("/api/debug/env", (req, res) => {
   res.json({
     NODE_ENV: process.env.NODE_ENV,
@@ -261,15 +226,17 @@ app.get("*", (req, res) => {
 });
 
 // ------------------------------
-// 14) Global error handler
+// 15) Global Error Handler
 // ------------------------------
 app.use((err, req, res, next) => {
   console.error("🔥 Uncaught Error:", err);
-  res.status(err.status || 500).json({ message: err.message || "Internal Server Error" });
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || "Internal Server Error" });
 });
 
 // ------------------------------
-// 15) Start server
+// 16) Start Server
 // ------------------------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
