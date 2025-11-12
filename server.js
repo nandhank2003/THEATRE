@@ -75,8 +75,9 @@ try {
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 const BACKEND_URL  = process.env.BACKEND_URL  || "";
 const RENDER_URLS  = [
-  "https://theatre-mrqa.onrender.com",
-  "https://theatre-1-err2.onrender.com",
+  "https://theatre-mrqa.onrender.com",    // Backend
+  "https://theatre-1-zlic.onrender.com",  // ✅ Your active frontend
+  "https://theatre-1-err2.onrender.com",  // Old frontend (optional)
 ].filter(Boolean);
 
 app.use(
@@ -164,10 +165,10 @@ app.use(
     }),
     cookie: {
       maxAge: 14 * 24 * 60 * 60 * 1000,
-      secure: isProd,                 // HTTPS only in production
+      secure: isProd,                 
       httpOnly: true,
-      sameSite: isProd ? "none" : "lax", // allow cross-site when FE & BE are on different domains
-      domain: undefined,              // let browser infer; set if you know your apex
+      sameSite: isProd ? "none" : "lax", 
+      domain: undefined,              
     },
     proxy: true,
   })
@@ -216,8 +217,7 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "✅ Server Running", time: new Date().toISOString() });
 });
 
-// Optional: Brevo SMTP verify endpoint (useful during setup)
-// Returns 200 if SMTP creds are valid / host reachable
+// Optional: Brevo SMTP verify endpoint
 app.get("/api/health/email", async (req, res) => {
   try {
     if (!process.env.BREVO_HOST) {
@@ -236,7 +236,7 @@ app.get("/api/health/email", async (req, res) => {
   }
 });
 
-// Debug (don’t expose in real prod—guard with a secret if needed)
+// Debug (temporary)
 app.get("/api/debug/env", (req, res) => {
   res.json({
     NODE_ENV: process.env.NODE_ENV,
@@ -248,7 +248,7 @@ app.get("/api/debug/env", (req, res) => {
   });
 });
 
-// 404 for unknown API routes (must be after your mounted routes)
+// 404 for unknown API routes
 app.use("/api", (req, res) => {
   res.status(404).json({
     message: `API endpoint not found: ${req.method} ${req.originalUrl}`,
