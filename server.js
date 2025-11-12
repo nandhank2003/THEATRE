@@ -62,8 +62,8 @@ app.set("trust proxy", 1);
 // 6) 🌐 CORS (Allow Netlify + Render + Local)
 // ------------------------------
 const allowedOrigins = [
-  "https://chipper-duckanoo-225d10.netlify.app", // ✅ your Netlify frontend
-  "https://theatre-1-zlic.onrender.com",         // ✅ your Render backend
+  "https://chipper-duckanoo-225d10.netlify.app", // ✅ Netlify frontend
+  "https://theatre-1-zlic.onrender.com",         // ✅ Render backend
   "http://localhost:5173",                       // local frontend dev
   "http://localhost:3000",
   "http://localhost:5000",
@@ -84,7 +84,7 @@ app.use(
 app.options("*", cors());
 
 // ------------------------------
-// 7) 🛡️ Helmet Security (with relaxed CSP for inline scripts)
+// 7) 🛡️ Helmet Security (CSP relaxed for Netlify + Render)
 // ------------------------------
 app.use(
   helmet({
@@ -93,11 +93,7 @@ app.use(
       useDefaults: true,
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: [
-          "'self'",
-          "'unsafe-inline'", // ✅ allows inline onclick handlers
-          "https:",
-        ],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https:"],
         scriptSrcAttr: ["'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'", "https:"],
         fontSrc: ["'self'", "https:"],
@@ -205,7 +201,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // ------------------------------
-// 14) Brevo SMTP Check (Optional)
+// 14) Brevo SMTP Health Check
 // ------------------------------
 app.get("/api/health/email", async (req, res) => {
   try {
@@ -214,21 +210,32 @@ app.get("/api/health/email", async (req, res) => {
         .status(400)
         .json({ ok: false, message: "BREVO_* env not set" });
     }
+
     const transporter = nodemailer.createTransport({
       host: process.env.BREVO_HOST,
       port: Number(process.env.BREVO_PORT || 587),
       secure: false,
-      auth: { user: process.env.BREVO_USER, pass: process.env.BREVO_PASS },
+      auth: {
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS,
+      },
+      connectionTimeout: 20000, // ⏳ 20s timeout to avoid Render ETIMEDOUT
     });
+
     await transporter.verify();
-    res.json({ ok: true, provider: "brevo", host: process.env.BREVO_HOST });
+    res.json({
+      ok: true,
+      provider: "brevo",
+      host: process.env.BREVO_HOST,
+    });
   } catch (e) {
+    console.error("❌ Brevo SMTP Error:", e.message);
     res.status(500).json({ ok: false, error: String(e?.message || e) });
   }
 });
 
 // ------------------------------
-// 15) Debug & Fallback
+// 15) Debug & Fallback APIs
 // ------------------------------
 app.get("/api/debug/env", (req, res) => {
   res.json({
@@ -253,7 +260,7 @@ app.get("*", (req, res) => {
 });
 
 // ------------------------------
-// 16) Error Handler
+// 16) Global Error Handler
 // ------------------------------
 app.use((err, req, res, next) => {
   console.error("🔥 Uncaught Error:", err);

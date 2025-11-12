@@ -1,6 +1,7 @@
 // =============================
-// 🎬 LOGIN / SIGNUP FUNCTIONAL JS (Fixed - Consistent Password Handling)
+// 🎬 LOGIN / SIGNUP FUNCTIONAL JS (Final Clean Version)
 // =============================
+
 // ✅ AUTO-DETECT LOCAL OR DEPLOYED BACKEND
 const isLocal =
   window.location.hostname === "localhost" ||
@@ -8,7 +9,7 @@ const isLocal =
 
 const API_BASE = isLocal
   ? "http://localhost:5000/api/users"
-  : "https://theatre-1-zlic.onrender.com/api/users"; // ✅ your correct live Render backend
+  : "https://theatre-1-zlic.onrender.com/api/users";
 
 // =============================
 // 🧭 FORM TOGGLE
@@ -59,7 +60,7 @@ document.querySelectorAll(".toggle-password").forEach((button) => {
 });
 
 // =============================
-// 🔔 NOTIFICATION
+// 🔔 NOTIFICATION HANDLER
 // =============================
 function showNotification(msg, type = "info") {
   const n = document.createElement("div");
@@ -70,38 +71,21 @@ function showNotification(msg, type = "info") {
 }
 
 // =============================
-// 🔑 LOGIN HANDLER (FIXED VERSION)
+// 🔑 LOGIN HANDLER
 // =============================
 const loginFormEl = loginForm?.querySelector(".auth-form");
 if (loginFormEl) {
   loginFormEl.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
-    // ✅ FIX: Get raw values without any processing
-    const email = document.getElementById("login-email").value;
+    const email = document.getElementById("login-email").value.trim().toLowerCase();
     const password = document.getElementById("login-password").value;
-    
-    // Normalize email only
-    const normalizedEmail = email.trim().toLowerCase();
 
-    console.log("🚨 LOGIN ATTEMPT - RAW DATA:", {
-      email: normalizedEmail,
-      rawPassword: password,
-      rawPasswordLength: password.length,
-      passwordCharCodes: Array.from(password).map(c => c.charCodeAt(0))
-    });
-
-    if (!normalizedEmail || !password)
+    if (!email || !password)
       return showNotification("⚠️ Please fill all fields", "error");
 
     try {
-      const requestData = {
-        email: normalizedEmail,
-        password: password // Send RAW password exactly as entered
-      };
+      const requestData = { email, password };
 
-      console.log("🚨 LOGIN - SENDING RAW DATA:", JSON.stringify(requestData, null, 2));
-      
       const res = await fetch(`${API_BASE}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,35 +93,22 @@ if (loginFormEl) {
       });
 
       const data = await res.json();
-      console.log("🚨 LOGIN RESPONSE:", {
-        status: res.status,
-        statusText: res.statusText,
-        responseData: data
-      });
-
-      if (!res.ok) {
-        console.log("❌ LOGIN FAILED:", data);
-        throw new Error(data?.message || "Login failed");
-      }
+      if (!res.ok) throw new Error(data?.message || "Login failed");
 
       // ✅ Save user data
       const sessionUser = {
         _id: data.user?._id,
         firstName: data.user?.firstName || "",
         lastName: data.user?.lastName || "",
-        email: data.user?.email || normalizedEmail,
+        email: data.user?.email || email,
         token: data.token,
         loggedIn: true,
         loginDate: new Date().toISOString(),
       };
-      localStorage.setItem("MALABAR CINEHUBUser", JSON.stringify(sessionUser));
+      localStorage.setItem("MALABAR_CINEHUB_USER", JSON.stringify(sessionUser));
 
       showNotification("✅ Login successful! Redirecting...", "success");
-
-      // ✅ Redirect with fallback
-      setTimeout(() => {
-        window.location.href = "/index.html";
-      }, 1200);
+      setTimeout(() => (window.location.href = "/index.html"), 1200);
     } catch (err) {
       console.error("❌ LOGIN ERROR:", err);
       showNotification(`⚠️ ${err.message}`, "error");
@@ -146,33 +117,19 @@ if (loginFormEl) {
 }
 
 // =============================
-// 📝 SIGNUP HANDLER (FIXED VERSION)
+// 📝 SIGNUP HANDLER
 // =============================
 const signupFormEl = signupForm?.querySelector(".auth-form");
 if (signupFormEl) {
   signupFormEl.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
-    // ✅ FIX: Get raw values - only trim names and email, keep password raw
     const firstName = document.getElementById("signup-firstname").value.trim();
     const lastName = document.getElementById("signup-lastname").value.trim();
-    const email = document.getElementById("signup-email").value;
+    const email = document.getElementById("signup-email").value.trim().toLowerCase();
     const phone = document.getElementById("signup-phone").value.trim();
-    const password = document.getElementById("signup-password").value; // RAW
-    const confirm = document.getElementById("signup-confirm-password").value; // RAW
+    const password = document.getElementById("signup-password").value;
+    const confirm = document.getElementById("signup-confirm-password").value;
     const terms = document.getElementById("terms").checked;
-
-    // Normalize email only
-    const normalizedEmail = email.trim().toLowerCase();
-
-    console.log("🔍 SIGNUP ATTEMPT:", {
-      email: normalizedEmail,
-      password: password,
-      passwordLength: password.length,
-      passwordCharCodes: Array.from(password).map(c => c.charCodeAt(0)),
-      confirmPassword: confirm,
-      confirmLength: confirm.length
-    });
 
     if (password !== confirm)
       return showNotification("❌ Passwords do not match!", "error");
@@ -180,32 +137,22 @@ if (signupFormEl) {
       return showNotification("⚠️ Please accept the terms & conditions", "error");
 
     try {
-      const requestData = {
-        firstName,
-        lastName,
-        email: normalizedEmail,
-        phone,
-        password: password // Send RAW password exactly as entered
-      };
+      const requestData = { firstName, lastName, email, phone, password };
 
-      console.log("🔍 SIGNUP - SENDING RAW DATA:", requestData);
-      
       const res = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),
       });
-      
+
       const data = await res.json();
-      console.log("🔍 SIGNUP RESPONSE:", data);
-      
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
       showNotification("✅ OTP sent! Please verify your email.", "info");
 
       if (otpSection) {
         showOnly(otpSection);
-        localStorage.setItem("pendingEmail", normalizedEmail);
+        localStorage.setItem("pendingEmail", email);
       } else {
         showOnly(loginForm);
       }
@@ -224,8 +171,7 @@ if (otpForm) {
   otpForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = localStorage.getItem("pendingEmail");
-    const otpInput = document.getElementById("otpInput");
-    const otp = otpInput?.value?.trim();
+    const otp = document.getElementById("otpInput")?.value?.trim();
 
     if (!email) return showNotification("No pending email!", "error");
     if (!otp) return showNotification("Enter OTP.", "error");
@@ -237,15 +183,13 @@ if (otpForm) {
         body: JSON.stringify({ email, otp }),
       });
       const data = await res.json();
-      console.log("🧩 Verify response:", data);
-
       if (!res.ok) throw new Error(data.message || "OTP verify failed");
 
       showNotification("✅ Email verified! You can now log in.", "success");
       localStorage.removeItem("pendingEmail");
       showOnly(loginForm);
     } catch (err) {
-      console.error("❌ Verify OTP error:", err);
+      console.error("❌ VERIFY ERROR:", err);
       showNotification(`⚠️ ${err.message}`, "error");
     }
   });
@@ -268,48 +212,35 @@ if (resendBtn) {
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
-      console.log("🧩 Resend OTP response:", data);
-
       if (!res.ok) throw new Error(data.message || "Failed to resend OTP");
       showNotification("🔄 OTP resent to your email.", "info");
     } catch (err) {
-      console.error("❌ Resend OTP error:", err);
+      console.error("❌ RESEND ERROR:", err);
       showNotification(`❌ ${err.message}`, "error");
     }
   });
 }
 
 // =============================
-// 🧪 TEST DIRECT API CALL
+// 🧪 TEST DIRECT API CALL (Optional)
 // =============================
 function testDirectLogin() {
   console.log("🧪 TESTING DIRECT API CALL...");
-
   const testData = {
     email: "nandhankd@gmail.com",
-    password: "Test321"
+    password: "Test321",
   };
 
-  console.log("🧪 SENDING:", testData);
-  console.log("🧪 PASSWORD CHAR CODES:", Array.from(testData.password).map(c => c.charCodeAt(0)));
-
-  fetch('http://localhost:5000/api/users/login', {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'X-Debug': 'true'
-    },
-    body: JSON.stringify(testData)
+  fetch(`${API_BASE}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(testData),
   })
-  .then(r => {
-    console.log("🧪 RESPONSE STATUS:", r.status, r.statusText);
-    return r.json();
-  })
-  .then(data => console.log("🧪 RESPONSE DATA:", data))
-  .catch(err => console.error("🧪 ERROR:", err));
+    .then((r) => r.json())
+    .then((data) => console.log("🧪 RESPONSE DATA:", data))
+    .catch((err) => console.error("🧪 ERROR:", err));
 }
 
-// Run test on page load for debugging
 setTimeout(() => {
   console.log("🔧 DEBUG: Page loaded, you can run testDirectLogin() in console");
   window.testDirectLogin = testDirectLogin;
