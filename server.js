@@ -1,8 +1,8 @@
-// 🎬 THEATRE BOOKING SERVER (Render + Brevo + Mongo Sessions)
-// ESM-ready. Works locally and on Render.
+// 🎬 THEATRE BOOKING SERVER (Render + Netlify + Brevo + Mongo Sessions)
+// ESM-ready. Works locally, on Render, and with Netlify frontend.
 
 // ------------------------------
-// 1) Load ENV first
+// 1) Load ENV
 // ------------------------------
 import dotenv from "dotenv";
 dotenv.config();
@@ -37,13 +37,13 @@ import adminRoutes from "./routes/adminRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 
 // ------------------------------
-// 3) Path helpers
+// 3) Path setup
 // ------------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ------------------------------
-// 4) Validate critical ENV
+// 4) Validate ENV
 // ------------------------------
 const requiredEnv = ["MONGO_URI", "JWT_SECRET"];
 for (const k of requiredEnv) {
@@ -53,29 +53,38 @@ console.log("🧩 Mongo URI Loaded:", !!process.env.MONGO_URI);
 console.log("🧩 JWT Secret Loaded:", !!process.env.JWT_SECRET);
 
 // ------------------------------
-// 5) App init
+// 5) Initialize App
 // ------------------------------
 const app = express();
 app.set("trust proxy", 1);
 
 // ------------------------------
-// 6) Basic Middlewares (Simplified CORS for same-origin deployment)
+// 6) 🌐 CORS (Allow Netlify + Render + Local)
 // ------------------------------
+const allowedOrigins = [
+  "https://chipper-duckanoo-225d10.netlify.app", // ✅ your Netlify frontend
+  "https://theatre-1-zlic.onrender.com",         // ✅ your Render backend
+  "http://localhost:5173",                       // local frontend dev
+  "http://localhost:3000",
+  "http://localhost:5000",
+];
+
 app.use(
   cors({
-    origin: true, // Automatically allows same-origin
-    credentials: true, // Enables cookies/sessions
+    origin: (origin, cb) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return cb(null, true);
+      }
+      console.log(`🚫 CORS Blocked: ${origin}`);
+      return cb(new Error(`CORS not allowed for ${origin}`), false);
+    },
+    credentials: true,
   })
 );
 app.options("*", cors());
 
-app.use(morgan("dev"));
-app.use(compression());
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
-
 // ------------------------------
-// 7) Helmet Security
+// 7) 🛡️ Helmet Security (with relaxed CSP for inline scripts)
 // ------------------------------
 app.use(
   helmet({
@@ -84,7 +93,12 @@ app.use(
       useDefaults: true,
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "https:"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'", // ✅ allows inline onclick handlers
+          "https:",
+        ],
+        scriptSrcAttr: ["'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'", "https:"],
         fontSrc: ["'self'", "https:"],
         imgSrc: [
@@ -94,7 +108,13 @@ app.use(
           "https://res.cloudinary.com",
           "https://ui-avatars.com",
         ],
-        connectSrc: ["'self'", "https:"],
+        connectSrc: [
+          "'self'",
+          "https://chipper-duckanoo-225d10.netlify.app",
+          "https://theatre-1-zlic.onrender.com",
+          "http://localhost:5173",
+          "http://localhost:5000",
+        ],
         frameSrc: ["'self'", "https:"],
         objectSrc: ["'none'"],
       },
@@ -103,7 +123,15 @@ app.use(
 );
 
 // ------------------------------
-// 8) Sessions (Mongo-backed)
+// 8) Logging, Compression, Parsers
+// ------------------------------
+app.use(morgan("dev"));
+app.use(compression());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// ------------------------------
+// 9) Sessions (Mongo)
 // ------------------------------
 const isProd = process.env.NODE_ENV === "production";
 app.use(
@@ -119,7 +147,7 @@ app.use(
     }),
     cookie: {
       maxAge: 14 * 24 * 60 * 60 * 1000,
-      secure: isProd, // HTTPS only in production
+      secure: isProd,
       httpOnly: true,
       sameSite: isProd ? "none" : "lax",
     },
@@ -128,7 +156,7 @@ app.use(
 );
 
 // ------------------------------
-// 9) Passport Config
+// 10) Passport Config
 // ------------------------------
 try {
   configurePassport(passport);
@@ -141,7 +169,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // ------------------------------
-// 10) Connect MongoDB
+// 11) MongoDB Connection
 // ------------------------------
 try {
   await connectDB();
@@ -155,7 +183,7 @@ try {
 }
 
 // ------------------------------
-// 11) API Routes
+// 12) API Routes
 // ------------------------------
 app.use("/api/movies", movieRoutes);
 app.use("/api/tickets", ticketRoutes);
@@ -167,7 +195,7 @@ app.use("/api/contact", contactRoutes);
 app.use("/auth", authRoutes);
 
 // ------------------------------
-// 12) Static / SPA
+// 13) Static Files / SPA
 // ------------------------------
 const publicPath = path.join(__dirname, "public");
 app.use(express.static(publicPath));
@@ -177,7 +205,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // ------------------------------
-// 13) Brevo SMTP Verify Endpoint (Optional)
+// 14) Brevo SMTP Check (Optional)
 // ------------------------------
 app.get("/api/health/email", async (req, res) => {
   try {
@@ -200,7 +228,7 @@ app.get("/api/health/email", async (req, res) => {
 });
 
 // ------------------------------
-// 14) Debug & Fallback Routes
+// 15) Debug & Fallback
 // ------------------------------
 app.get("/api/debug/env", (req, res) => {
   res.json({
@@ -213,20 +241,19 @@ app.get("/api/debug/env", (req, res) => {
   });
 });
 
-// 404 for unknown API routes
 app.use("/api", (req, res) => {
   res.status(404).json({
     message: `API endpoint not found: ${req.method} ${req.originalUrl}`,
   });
 });
 
-// Fallback to SPA index.html
+// SPA fallback
 app.get("*", (req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));
 });
 
 // ------------------------------
-// 15) Global Error Handler
+// 16) Error Handler
 // ------------------------------
 app.use((err, req, res, next) => {
   console.error("🔥 Uncaught Error:", err);
@@ -236,7 +263,7 @@ app.use((err, req, res, next) => {
 });
 
 // ------------------------------
-// 16) Start Server
+// 17) Start Server
 // ------------------------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
