@@ -1,13 +1,14 @@
 // =============================
 // 🎬 LOGIN / SIGNUP FUNCTIONAL JS (Fixed - Consistent Password Handling)
 // =============================
-
 // ✅ AUTO-DETECT LOCAL OR DEPLOYED BACKEND
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const isLocal =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
 
 const API_BASE = isLocal
   ? "http://localhost:5000/api/users"
-  : "https://theatre-mrqa.onrender.com/api/users"; // ✅ your new live Render backend
+  : "https://theatre-1-zlic.onrender.com/api/users"; // ✅ your correct live Render backend
 
 // =============================
 // 🧭 FORM TOGGLE
