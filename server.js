@@ -1,5 +1,5 @@
-// 🎬 THEATRE BOOKING SERVER (Render + Netlify + Brevo + Mongo Sessions)
-// ESM-ready. Works locally, on Render, and with Netlify frontend.
+// 🎬 THEATRE BOOKING SERVER (Cyclic + Netlify + Gmail SMTP + Mongo Sessions)
+// ESM-ready. Works locally and on Cyclic.
 
 // ------------------------------
 // 1) Load ENV
@@ -45,12 +45,13 @@ const __dirname = path.dirname(__filename);
 // ------------------------------
 // 4) Validate ENV
 // ------------------------------
-const requiredEnv = ["MONGO_URI", "JWT_SECRET"];
+const requiredEnv = ["MONGO_URI", "JWT_SECRET", "EMAIL_USER", "EMAIL_PASS"];
 for (const k of requiredEnv) {
   if (!process.env[k]) console.error(`❌ Missing ${k} in .env`);
 }
 console.log("🧩 Mongo URI Loaded:", !!process.env.MONGO_URI);
 console.log("🧩 JWT Secret Loaded:", !!process.env.JWT_SECRET);
+console.log("📧 Gmail SMTP Loaded:", !!process.env.EMAIL_USER);
 
 // ------------------------------
 // 5) Initialize App
@@ -59,12 +60,12 @@ const app = express();
 app.set("trust proxy", 1);
 
 // ------------------------------
-// 6) 🌐 CORS (Allow Netlify + Render + Local)
+// 6) 🌐 CORS (Allow Netlify + Cyclic + Local)
 // ------------------------------
 const allowedOrigins = [
   "https://chipper-duckanoo-225d10.netlify.app", // ✅ Netlify frontend
-  "https://theatre-1-zlic.onrender.com",         // ✅ Render backend
-  "http://localhost:5173",                       // local frontend dev
+  "https://your-app-name.cyclic.app",            // ✅ Cyclic backend
+  "http://localhost:5173",                       // local dev
   "http://localhost:3000",
   "http://localhost:5000",
 ];
@@ -84,7 +85,7 @@ app.use(
 app.options("*", cors());
 
 // ------------------------------
-// 7) 🛡️ Helmet Security (CSP relaxed for Netlify + Render)
+// 7) 🛡️ Helmet Security (CSP relaxed for Netlify + Cyclic)
 // ------------------------------
 app.use(
   helmet({
@@ -107,7 +108,7 @@ app.use(
         connectSrc: [
           "'self'",
           "https://chipper-duckanoo-225d10.netlify.app",
-          "https://theatre-1-zlic.onrender.com",
+          "https://your-app-name.cyclic.app",
           "http://localhost:5173",
           "http://localhost:5000",
         ],
@@ -201,35 +202,30 @@ app.get("/api/health", (req, res) => {
 });
 
 // ------------------------------
-// 14) Brevo SMTP Health Check
+// 14) Gmail SMTP Health Check
 // ------------------------------
 app.get("/api/health/email", async (req, res) => {
   try {
-    if (!process.env.BREVO_HOST) {
-      return res
-        .status(400)
-        .json({ ok: false, message: "BREVO_* env not set" });
-    }
-
     const transporter = nodemailer.createTransport({
-      host: process.env.BREVO_HOST,
-      port: Number(process.env.BREVO_PORT || 587),
+      host: "smtp.gmail.com",
+      port: 587,
       secure: false,
       auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS,
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
-      connectionTimeout: 20000, // ⏳ 20s timeout to avoid Render ETIMEDOUT
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 20000,
     });
 
     await transporter.verify();
     res.json({
       ok: true,
-      provider: "brevo",
-      host: process.env.BREVO_HOST,
+      provider: "gmail",
+      host: "smtp.gmail.com",
     });
   } catch (e) {
-    console.error("❌ Brevo SMTP Error:", e.message);
+    console.error("❌ Gmail SMTP Error:", e.message);
     res.status(500).json({ ok: false, error: String(e?.message || e) });
   }
 });
@@ -243,8 +239,7 @@ app.get("/api/debug/env", (req, res) => {
     MONGO_URI_LOADED: !!process.env.MONGO_URI,
     JWT_SECRET_LOADED: !!process.env.JWT_SECRET,
     SESSION_SECRET_LOADED: !!process.env.SESSION_SECRET,
-    BREVO_HOST_LOADED: !!process.env.BREVO_HOST,
-    BREVO_USER_LOADED: !!process.env.BREVO_USER,
+    EMAIL_USER_LOADED: !!process.env.EMAIL_USER,
   });
 });
 

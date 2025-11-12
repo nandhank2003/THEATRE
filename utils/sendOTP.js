@@ -2,28 +2,30 @@
 import nodemailer from "nodemailer";
 
 export const sendOTPEmail = async (email, otp) => {
-  // --- Safety check for Brevo SMTP ---
-  if (!process.env.BREVO_USER || !process.env.BREVO_PASS) {
-    console.error("❌ Missing BREVO_USER or BREVO_PASS in environment variables.");
-    console.log("📧 OTP Email not sent. Check Render Brevo environment configuration.");
-    throw new Error("Brevo email service is not configured.");
+  // --- Safety check for Gmail SMTP ---
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("❌ Missing EMAIL_USER or EMAIL_PASS in environment variables.");
+    console.log("📧 OTP Email not sent. Check your Gmail App Password configuration in Cyclic or .env.");
+    throw new Error("Gmail email service is not configured.");
   }
 
   try {
-    // ✅ Use Brevo SMTP (Port 587 TLS)
+    // ✅ Use Gmail SMTP (Port 587 TLS)
     const transporter = nodemailer.createTransport({
-      host: process.env.BREVO_HOST || "smtp-relay.brevo.com",
-      port: process.env.BREVO_PORT || 587,
+      host: "smtp.gmail.com",
+      port: 587,
       secure: false, // false for 587 (TLS)
       auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS,
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 20000, // Prevent timeout on free hosts like Cyclic
     });
 
-    // ✅ OTP Email HTML Template (same beautiful layout)
+    // ✅ OTP Email HTML Template (same style, just Gmail-based)
     const mailOptions = {
-      from: `"MALABAR CINEHUB Verification" <${process.env.BREVO_USER}>`,
+      from: `"MALABAR CINEHUB Verification" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "🎬 MALABAR CINEHUB - Verify Your Email",
       html: `
@@ -44,8 +46,8 @@ export const sendOTPEmail = async (email, otp) => {
     await transporter.sendMail(mailOptions);
     console.log(`✅ OTP email sent successfully to ${email}`);
   } catch (error) {
-    console.error("❌ Brevo SMTP Error: Failed to send OTP email.", error);
-    console.error("💡 Tip: Ensure BREVO_HOST, BREVO_USER, and BREVO_PASS are correct in Render.");
+    console.error("❌ Gmail SMTP Error: Failed to send OTP email.", error);
+    console.error("💡 Tip: Ensure EMAIL_USER and EMAIL_PASS (App Password) are correct in Cyclic or .env.");
     throw error;
   }
 };
