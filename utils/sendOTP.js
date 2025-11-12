@@ -2,29 +2,28 @@
 import nodemailer from "nodemailer";
 
 export const sendOTPEmail = async (email, otp) => {
-  // --- Production Safety Check ---
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("❌ Missing EMAIL_USER or EMAIL_PASS in environment variables.");
-    console.log("📧 OTP Email not sent. Check Render environment configuration.");
-    // Throw an error to be caught by the route handler
-    throw new Error("Email service is not configured.");
+  // --- Safety check for Brevo SMTP ---
+  if (!process.env.BREVO_USER || !process.env.BREVO_PASS) {
+    console.error("❌ Missing BREVO_USER or BREVO_PASS in environment variables.");
+    console.log("📧 OTP Email not sent. Check Render Brevo environment configuration.");
+    throw new Error("Brevo email service is not configured.");
   }
 
   try {
-    // ✅ Use Nodemailer with Port 465 (SSL) for better reliability on cloud platforms
+    // ✅ Use Brevo SMTP (Port 587 TLS)
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // true for 465, false for other ports
+      host: process.env.BREVO_HOST || "smtp-relay.brevo.com",
+      port: process.env.BREVO_PORT || 587,
+      secure: false, // false for 587 (TLS)
       auth: {
-        user: process.env.EMAIL_USER, // Your Gmail address
-        pass: process.env.EMAIL_PASS, // Your Gmail App Password
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS,
       },
     });
 
-    // ✅ OTP Email HTML Template
+    // ✅ OTP Email HTML Template (same beautiful layout)
     const mailOptions = {
-      from: `"MALABAR CINEHUB Verification" <${process.env.EMAIL_USER}>`,
+      from: `"MALABAR CINEHUB Verification" <${process.env.BREVO_USER}>`,
       to: email,
       subject: "🎬 MALABAR CINEHUB - Verify Your Email",
       html: `
@@ -45,8 +44,8 @@ export const sendOTPEmail = async (email, otp) => {
     await transporter.sendMail(mailOptions);
     console.log(`✅ OTP email sent successfully to ${email}`);
   } catch (error) {
-    console.error("❌ Nodemailer Error (Port 465): Failed to send OTP email.", error);
-    console.error("💡 Tip: Ensure EMAIL_USER and EMAIL_PASS (App Password) are correct in Render and that 2FA is enabled on the Google account.");
-    throw error; // Re-throw the error to be handled by the caller
+    console.error("❌ Brevo SMTP Error: Failed to send OTP email.", error);
+    console.error("💡 Tip: Ensure BREVO_HOST, BREVO_USER, and BREVO_PASS are correct in Render.");
+    throw error;
   }
 };

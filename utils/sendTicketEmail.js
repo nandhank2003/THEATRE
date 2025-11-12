@@ -3,20 +3,21 @@ import nodemailer from "nodemailer";
 
 export const sendTicketEmail = async (user, booking, ticketData) => {
   // --- Production Safety Check ---
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("❌ Missing EMAIL_USER or EMAIL_PASS in environment variables.");
-    console.log("📧 Ticket Email not sent. Check Render environment configuration.");
+  if (!process.env.BREVO_USER || !process.env.BREVO_PASS) {
+    console.error("❌ Missing BREVO_USER or BREVO_PASS in environment variables.");
+    console.log("📧 Ticket Email not sent. Check Render Brevo configuration.");
     return false;
   }
 
   try {
+    // ✅ Use Brevo SMTP (Port 587 TLS)
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // Use SSL
+      host: process.env.BREVO_HOST || "smtp-relay.brevo.com",
+      port: process.env.BREVO_PORT || 587,
+      secure: false, // TLS (not SSL)
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS,
       },
     });
 
@@ -103,7 +104,7 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
 </html>`;
 
     const mailOptions = {
-      from: `"MALABAR CINEHUB" <${process.env.EMAIL_USER}>`,
+      from: `"MALABAR CINEHUB" <${process.env.BREVO_USER}>`,
       to: user.email,
       subject: `🎫 Your MALABAR CINEHUB Ticket - ${booking.movie?.title || "Movie"}`,
       html: emailHTML,
@@ -113,7 +114,7 @@ export const sendTicketEmail = async (user, booking, ticketData) => {
     console.log(`✅ Ticket email sent successfully to ${user.email}`);
     return true;
   } catch (error) {
-    console.error("❌ Nodemailer Error (Port 465): Failed to send ticket email.", error);
+    console.error("❌ Brevo SMTP Error: Failed to send ticket email.", error);
     return false; // Do not break booking if email fails
   }
 };
