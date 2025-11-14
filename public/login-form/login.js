@@ -3,15 +3,15 @@
 // =============================
 
 // =============================
-// 🔍 AUTO-DETECT BACKEND URL
+// 🔍 AUTO-DETECT BACKEND URL (FINAL FIX)
 // =============================
 const isLocal =
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1";
 
-const API_BASE = isLocal
-  ? "http://localhost:5000/auth"
-  : "https://theatre-1-zlic.onrender.com/auth";
+// 👉 LOCAL → http://localhost:5000
+// 👉 RENDER → "" (same domain)
+const API_BASE = isLocal ? "http://localhost:5000" : "";
 
 console.log("🌐 USING API:", API_BASE);
 
@@ -76,6 +76,7 @@ function showNotification(msg, type = "info") {
 // 🔑 LOGIN HANDLER
 // =============================
 const loginFormEl = loginForm?.querySelector(".auth-form");
+
 if (loginFormEl) {
   loginFormEl.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -87,7 +88,7 @@ if (loginFormEl) {
       return showNotification("⚠️ Please fill all fields", "error");
 
     try {
-      const res = await fetch(`${API_BASE}/login`, {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -96,7 +97,6 @@ if (loginFormEl) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
 
-      // Save session
       const sessionUser = {
         _id: data.user?.id,
         firstName: data.user?.firstName,
@@ -141,7 +141,7 @@ if (signupFormEl) {
       return showNotification("⚠️ Please accept the Terms & Conditions", "error");
 
     try {
-      const res = await fetch(`${API_BASE}/register`, {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -158,7 +158,6 @@ if (signupFormEl) {
 
       showNotification("📩 OTP sent to your email!", "info");
 
-      // Show OTP page
       localStorage.setItem("pendingEmail", email);
       showOnly(otpSection);
     } catch (err) {
@@ -184,7 +183,7 @@ if (otpForm) {
     if (!otp) return showNotification("Enter OTP!", "error");
 
     try {
-      const res = await fetch(`${API_BASE}/verify-otp`, {
+      const res = await fetch(`${API_BASE}/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -215,10 +214,10 @@ if (resendBtn) {
     if (!email) return showNotification("No email to resend!", "error");
 
     try {
-      const res = await fetch(`${API_BASE}/register`, {
+      const res = await fetch(`${API_BASE}/auth/resend-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }), // backend auto resends OTP
+        body: JSON.stringify({ email }),
       });
 
       const data = await res.json();
@@ -232,11 +231,14 @@ if (resendBtn) {
   });
 }
 
-// DEBUG TOOL
+// =============================
+// 🧪 DEBUG TOOL
+// =============================
 setTimeout(() => {
   console.log("🔧 testDirectLogin() available");
+
   window.testDirectLogin = function () {
-    fetch(`${API_BASE}/login`, {
+    fetch(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: "test@mail.com", password: "Test123" }),
