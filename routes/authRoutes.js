@@ -56,7 +56,7 @@ router.post("/register", async (req, res) => {
 
     // SEND OTP EMAIL
     await getResend().emails.send({
-      from: "onboarding@resend.dev",   // FIXED**
+      from: process.env.CONTACT_FROM_EMAIL,
       to: normalized,
       subject: "Your MALABAR CINEHUB OTP",
       html: `
