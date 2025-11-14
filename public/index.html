@@ -2,54 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="MALABAR CINEHUB - Your premium destination for the ultimate cinema experience">
     <title>MALABAR CINEHUB - Premium Cinema Experience</title>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="/style.css">
+    
+    <!-- Prevent zoom on input focus (iOS) -->
+    <style>
+        input, textarea, select {
+            font-size: 16px !important;
+        }
+    </style>
 </head>
 <body>
-<!-- Navbar -->
-<nav id="navbar">
-    <div class="logo">
-        <img src="/asset/Logo.png" alt="MALABAR CINEHUB" onerror="this.style.display='none'">
-        <span>MALABAR CINEHUB</span>
-    </div>
-    <ul class="nav-links" id="navLinks">
-        <li><a href="/index.html">Home</a></li>
-        <li><a href="/about/about.html">About</a></li>
-        <li><a href="/movies/movies.html">Movies</a></li>
-        <li><a href="/contact/contact.html">Contact</a></li>
-    </ul>
-    
-    <!-- Updated Button Container -->
-<div class="nav-buttons">
-    <a href="/booking/booking.html" class="ticket-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
-            <path d="M13 5v2"></path>
-            <path d="M13 17v2"></path>
-            <path d="M13 11v2"></path>
-        </svg>
-        Book Tickets
-    </a>
-    <a href="/login-form/login.html" class="login-btn">Login</a>
-</div>
+    <!-- Navbar -->
+    <nav id="navbar">
+        <div class="logo">
+            <img src="/asset/Logo.png" alt="MALABAR CINEHUB" onerror="this.style.display='none'">
+            <span>MALABAR CINEHUB</span>
+        </div>
+        
+        <!-- Desktop Navigation Links -->
+        <ul class="nav-links" id="navLinks">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/about/about.html">About</a></li>
+            <li><a href="/movies/movies.html">Movies</a></li>
+            <li><a href="/contact/contact.html">Contact</a></li>
+        </ul>
+        
+        <!-- Desktop Nav Buttons (Ticket + Login/Profile) -->
+        <div class="nav-buttons">
+           <a href="/booking/booking.html" 
+   class="ticket-btn" 
+   data-require-login="true">
 
-    <div class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-</nav>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" 
+         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
+        <path d="M13 5v2"></path>
+        <path d="M13 17v2"></path>
+        <path d="M13 11v2"></path>
+    </svg>
 
+    <span>Tickets</span>
+</a>
+
+            <a href="/login-form/login.html" class="login-btn">Login</a>
+        </div>
+
+        <!-- Hamburger Menu (Mobile) -->
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <button class="book-now-btn">
+            <button class="book-now-btn" onclick="window.location.href='/booking/booking.html'">
                 <span>BOOK NOW</span>
-                <div class="ripple"></div>
             </button>
         </div>
         <div class="scroll-indicator">
@@ -65,7 +85,7 @@
             <div class="pyramid-row row-1">
                 <div class="logo-wrapper" data-index="0">
                     <div class="logo-box">
-                        <img src="/asset/ashirvad.png" alt="Warner Bros" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Warner'">
+                        <img src="/asset/ashirvad.png" alt="Ashirvad Cinemas" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Ashirvad'">
                     </div>
                 </div>
             </div>
@@ -74,12 +94,12 @@
             <div class="pyramid-row row-2">
                 <div class="logo-wrapper" data-index="1">
                     <div class="logo-box">
-                        <img src="/asset/amal.png" alt="Disney" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Disney'">
+                        <img src="/asset/amal.png" alt="Amal Neerad Productions" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Amal'">
                     </div>
                 </div>
                 <div class="logo-wrapper" data-index="2">
                     <div class="logo-box">
-                        <img src="/asset/anwar.png" alt="Universal" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Universal'">
+                        <img src="/asset/anwar.png" alt="Anwar Rasheed Entertainments" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Anwar'">
                     </div>
                 </div>
             </div>
@@ -88,17 +108,17 @@
             <div class="pyramid-row row-3">
                 <div class="logo-wrapper" data-index="3">
                     <div class="logo-box">
-                        <img src="/asset/ashique.png" alt="Paramount" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Paramount'">
+                        <img src="/asset/ashique.png" alt="Ashique Abu" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Ashique'">
                     </div>
                 </div>
                 <div class="logo-wrapper" data-index="4">
                     <div class="logo-box">
-                        <img src="/asset/dulqer.png" alt="Sony" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Sony'">
+                        <img src="/asset/dulqer.png" alt="Wayfarer Films" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Wayfarer'">
                     </div>
                 </div>
                 <div class="logo-wrapper" data-index="5">
                     <div class="logo-box">
-                        <img src="/asset/friday.png" alt="20th Century" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Fox'">
+                        <img src="/asset/friday.png" alt="Friday Film House" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Friday'">
                     </div>
                 </div>
             </div>
@@ -107,22 +127,22 @@
             <div class="pyramid-row row-4">
                 <div class="logo-wrapper" data-index="6">
                     <div class="logo-box">
-                        <img src="/asset/gokulam.png" alt="MGM" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=MGM'">
+                        <img src="/asset/gokulam.png" alt="Gokulam Gopalan" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Gokulam'">
                     </div>
                 </div>
                 <div class="logo-wrapper" data-index="7">
                     <div class="logo-box">
-                        <img src="/asset/magic.png" alt="Lionsgate" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Lionsgate'">
+                        <img src="/asset/magic.png" alt="Magic Frames" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Magic'">
                     </div>
                 </div>
                 <div class="logo-wrapper" data-index="8">
                     <div class="logo-box">
-                        <img src="/asset/mammotty.png" alt="Marvel" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Marvel'">
+                        <img src="/asset/mammotty.png" alt="Mammootty Kampany" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Mammootty'">
                     </div>
                 </div>
                 <div class="logo-wrapper" data-index="9">
                     <div class="logo-box">
-                        <img src="/asset/prithwiraj.png" alt="Pixar" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Pixar'">
+                        <img src="/asset/prithwiraj.png" alt="Prithviraj Productions" onerror="this.src='https://via.placeholder.com/120x60/333/fff?text=Prithviraj'">
                     </div>
                 </div>
             </div>
@@ -204,7 +224,7 @@
                     <ul class="contact-info">
                         <li>📍 Sharjah, UAE</li>
                         <li>📞 +971 XX XXX XXXX</li>
-                        <li>✉️ info@MALABAR CINEHUB.com</li>
+                        <li>✉️ info@malabarcinehub.com</li>
                         <li>🕐 10:00 AM - 12:00 AM</li>
                     </ul>
                 </div>
@@ -224,6 +244,9 @@
         </div>
     </footer>
 
+    <!-- Mobile Bottom Navigation will be injected here by JavaScript -->
+
+    <!-- Scripts -->
     <script src="/script.js"></script>
 </body>
 </html>

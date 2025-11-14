@@ -1,89 +1,50 @@
+import crypto from "crypto";
 import QRCode from "qrcode";
-import Booking from "../models/Booking.js";
+import Ticket from "../models/Ticket.js";
 
+// Helper to create a readable booking code
+function generateBookingCode(booking) {
+  const shortId = booking._id.toString().slice(-6).toUpperCase();
+  return `MCB-${shortId}`;
+}
+
+function generateTicketId() {
+  return "TIC-" + crypto.randomBytes(5).toString("hex").toUpperCase();
+}
+
+// 🟢 Generate ticket after successful payment
 export async function generateTicket(booking) {
-  try {
-    // Generate unique ticket ID
-    const ticketId = `TKT-${booking._id.toString().slice(-8).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
-    
-    // Create ticket data string for QR code
-    const ticketData = {
-      bookingId: booking._id.toString(),
-      ticketId: ticketId,
-      movie: booking.movie.title,
-      screen: booking.screen.name,
-      seats: booking.seats.join(", "),
-      date: booking.bookingTime.toISOString(),
-      amount: booking.totalAmount,
-    };
-    
-    const qrDataString = JSON.stringify(ticketData);
-    
-    // Generate QR code as data URL
-    const qrCodeDataURL = await QRCode.toDataURL(qrDataString, {
-      errorCorrectionLevel: "M",
-      type: "image/png",
-      width: 200,
-      margin: 2,
-    });
-    
-    // Update booking with ticket ID
-    booking.ticketId = ticketId;
-    await booking.save();
-    
-    return {
-      ticketId,
-      qrCode: qrCodeDataURL,
-      bookingData: ticketData,
-    };
-  } catch (error) {
-    console.error("Ticket generation failed:", error);
-    throw error;
-  }
+  // booking: populated with movie, screen, user
+  const existing = await Ticket.findOne({ booking: booking._id });
+  if (existing) return existing;
+
+  const bookingCode = generateBookingCode(booking);
+  const ticketId = generateTicketId();
+
+  const verifyUrl = `${process.env.CLIENT_VERIFY_URL || "https://yourdomain.com"}/verify/${bookingCode}`;
+
+  const qrCode = await QRCode.toDataURL(verifyUrl);
+
+  const showTime = booking.bookingTime || new Date(); // fallback if showTime not stored separately
+
+  const ticket = await Ticket.create({
+    booking: booking._id,
+    bookingId: bookingCode,
+    ticketId,
+    qrCode,
+    used: false,
+    movieTitle: booking.movie?.title || "Movie",
+    screenName: booking.screen?.name || "Screen",
+    seats: booking.seats || [],
+    showTime,
+    email: booking.user?.email || "",
+  });
+
+  return ticket;
 }
 
+// 🟡 Fetch ticket via Booking _id
 export async function getTicketByBookingId(bookingId) {
-  try {
-    const booking = await Booking.findById(bookingId)
-      .populate("movie")
-      .populate("screen")
-      .populate("user", "firstName lastName email");
-    
-    if (!booking || !booking.ticketId) {
-      return null;
-    }
-    
-    const ticketData = {
-      bookingId: booking._id.toString(),
-      ticketId: booking.ticketId,
-      movie: booking.movie.title,
-      screen: booking.screen.name,
-      seats: booking.seats.join(", "),
-      date: booking.bookingTime,
-      amount: booking.totalAmount,
-    };
-    
-    const qrDataString = JSON.stringify(ticketData);
-    const qrCodeDataURL = await QRCode.toDataURL(qrDataString, {
-      errorCorrectionLevel: "M",
-      type: "image/png",
-      width: 200,
-      margin: 2,
-    });
-    
-    return {
-      ticketId: booking.ticketId,
-      qrCode: qrCodeDataURL,
-      booking: booking,
-      bookingData: ticketData,
-    };
-  } catch (error) {
-    console.error("Get ticket failed:", error);
-    throw error;
-  }
+  const ticket = await Ticket.findOne({ booking: bookingId });
+  return ticket;
 }
-
-
-
-
-

@@ -1,15 +1,19 @@
 // =============================
-// 🎬 LOGIN / SIGNUP FUNCTIONAL JS (Final Clean Version)
+// 🎬 MALABAR CINEHUB LOGIN / SIGNUP JS
 // =============================
 
-// ✅ AUTO-DETECT LOCAL OR DEPLOYED BACKEND
+// =============================
+// 🔍 AUTO-DETECT BACKEND URL
+// =============================
 const isLocal =
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1";
 
 const API_BASE = isLocal
-  ? "http://localhost:5000/api/users"
-  : "https://theatre-1-zlic.onrender.com/api/users";
+  ? "http://localhost:5000/auth"
+  : "https://theatre-1-zlic.onrender.com/auth";
+
+console.log("🌐 USING API:", API_BASE);
 
 // =============================
 // 🧭 FORM TOGGLE
@@ -30,20 +34,18 @@ toggleFormLinks.forEach((link) => {
   link.addEventListener("click", (e) => {
     e.preventDefault();
     const target = link.dataset.target;
-    if (target === "signup") showOnly(signupForm);
-    else showOnly(loginForm);
+    target === "signup" ? showOnly(signupForm) : showOnly(loginForm);
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 });
 
 // =============================
-// 👁 PASSWORD VISIBILITY
+// 👁 PASSWORD VISIBILITY TOGGLE
 // =============================
 document.querySelectorAll(".toggle-password").forEach((button) => {
   button.addEventListener("click", () => {
     const target = document.getElementById(button.dataset.target);
     const eye = button.querySelector(".eye-icon");
-    if (!target || !eye) return;
 
     if (target.type === "password") {
       target.type = "text";
@@ -60,7 +62,7 @@ document.querySelectorAll(".toggle-password").forEach((button) => {
 });
 
 // =============================
-// 🔔 NOTIFICATION HANDLER
+// 🔔 NOTIFICATION SYSTEM
 // =============================
 function showNotification(msg, type = "info") {
   const n = document.createElement("div");
@@ -77,6 +79,7 @@ const loginFormEl = loginForm?.querySelector(".auth-form");
 if (loginFormEl) {
   loginFormEl.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const email = document.getElementById("login-email").value.trim().toLowerCase();
     const password = document.getElementById("login-password").value;
 
@@ -84,34 +87,33 @@ if (loginFormEl) {
       return showNotification("⚠️ Please fill all fields", "error");
 
     try {
-      const requestData = { email, password };
-
       const res = await fetch(`${API_BASE}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Login failed");
+      if (!res.ok) throw new Error(data.message || "Login failed");
 
-      // ✅ Save user data
+      // Save session
       const sessionUser = {
-        _id: data.user?._id,
-        firstName: data.user?.firstName || "",
-        lastName: data.user?.lastName || "",
-        email: data.user?.email || email,
+        _id: data.user?.id,
+        firstName: data.user?.firstName,
+        lastName: data.user?.lastName,
+        email: data.user?.email,
+        isAdmin: data.user?.isAdmin || false,
         token: data.token,
         loggedIn: true,
-        loginDate: new Date().toISOString(),
       };
+
       localStorage.setItem("MALABAR_CINEHUB_USER", JSON.stringify(sessionUser));
 
       showNotification("✅ Login successful! Redirecting...", "success");
       setTimeout(() => (window.location.href = "/index.html"), 1200);
     } catch (err) {
-      console.error("❌ LOGIN ERROR:", err);
-      showNotification(`⚠️ ${err.message}`, "error");
+      console.error("LOGIN ERROR:", err);
+      showNotification(err.message, "error");
     }
   });
 }
@@ -120,9 +122,11 @@ if (loginFormEl) {
 // 📝 SIGNUP HANDLER
 // =============================
 const signupFormEl = signupForm?.querySelector(".auth-form");
+
 if (signupFormEl) {
   signupFormEl.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const firstName = document.getElementById("signup-firstname").value.trim();
     const lastName = document.getElementById("signup-lastname").value.trim();
     const email = document.getElementById("signup-email").value.trim().toLowerCase();
@@ -134,47 +138,50 @@ if (signupFormEl) {
     if (password !== confirm)
       return showNotification("❌ Passwords do not match!", "error");
     if (!terms)
-      return showNotification("⚠️ Please accept the terms & conditions", "error");
+      return showNotification("⚠️ Please accept the Terms & Conditions", "error");
 
     try {
-      const requestData = { firstName, lastName, email, phone, password };
-
       const res = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          phone,
+          password,
+        }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
-      showNotification("✅ OTP sent! Please verify your email.", "info");
+      showNotification("📩 OTP sent to your email!", "info");
 
-      if (otpSection) {
-        showOnly(otpSection);
-        localStorage.setItem("pendingEmail", email);
-      } else {
-        showOnly(loginForm);
-      }
+      // Show OTP page
+      localStorage.setItem("pendingEmail", email);
+      showOnly(otpSection);
     } catch (err) {
-      console.error("❌ SIGNUP ERROR:", err);
-      showNotification(`⚠️ ${err.message}`, "error");
+      console.error("SIGNUP ERROR:", err);
+      showNotification(err.message, "error");
     }
   });
 }
 
 // =============================
-// 🔐 VERIFY OTP HANDLER
+// 🔐 VERIFY OTP
 // =============================
 const otpForm = document.getElementById("otpForm");
+
 if (otpForm) {
   otpForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const email = localStorage.getItem("pendingEmail");
     const otp = document.getElementById("otpInput")?.value?.trim();
 
-    if (!email) return showNotification("No pending email!", "error");
-    if (!otp) return showNotification("Enter OTP.", "error");
+    if (!email) return showNotification("No email found!", "error");
+    if (!otp) return showNotification("Enter OTP!", "error");
 
     try {
       const res = await fetch(`${API_BASE}/verify-otp`, {
@@ -182,66 +189,60 @@ if (otpForm) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "OTP verify failed");
 
-      showNotification("✅ Email verified! You can now log in.", "success");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      showNotification("🎉 OTP verified! You can now log in.", "success");
+
       localStorage.removeItem("pendingEmail");
       showOnly(loginForm);
     } catch (err) {
-      console.error("❌ VERIFY ERROR:", err);
-      showNotification(`⚠️ ${err.message}`, "error");
+      console.error("VERIFY ERROR:", err);
+      showNotification(err.message, "error");
     }
   });
 }
 
 // =============================
-// 🔁 RESEND OTP HANDLER
+// 🔁 RESEND OTP
 // =============================
 const resendBtn = document.getElementById("resendOtpBtn");
+
 if (resendBtn) {
-  resendBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
+  resendBtn.addEventListener("click", async () => {
     const email = localStorage.getItem("pendingEmail");
-    if (!email) return showNotification("No pending email!", "error");
+    if (!email) return showNotification("No email to resend!", "error");
 
     try {
-      const res = await fetch(`${API_BASE}/resend-otp`, {
+      const res = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email }), // backend auto resends OTP
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to resend OTP");
+      if (!res.ok) throw new Error(data.message);
+
       showNotification("🔄 OTP resent to your email.", "info");
     } catch (err) {
-      console.error("❌ RESEND ERROR:", err);
-      showNotification(`❌ ${err.message}`, "error");
+      console.error("RESEND ERROR:", err);
+      showNotification(err.message, "error");
     }
   });
 }
 
-// =============================
-// 🧪 TEST DIRECT API CALL (Optional)
-// =============================
-function testDirectLogin() {
-  console.log("🧪 TESTING DIRECT API CALL...");
-  const testData = {
-    email: "nandhankd@gmail.com",
-    password: "Test321",
-  };
-
-  fetch(`${API_BASE}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(testData),
-  })
-    .then((r) => r.json())
-    .then((data) => console.log("🧪 RESPONSE DATA:", data))
-    .catch((err) => console.error("🧪 ERROR:", err));
-}
-
+// DEBUG TOOL
 setTimeout(() => {
-  console.log("🔧 DEBUG: Page loaded, you can run testDirectLogin() in console");
-  window.testDirectLogin = testDirectLogin;
+  console.log("🔧 testDirectLogin() available");
+  window.testDirectLogin = function () {
+    fetch(`${API_BASE}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: "test@mail.com", password: "Test123" }),
+    })
+      .then((r) => r.json())
+      .then(console.log)
+      .catch(console.error);
+  };
 }, 1000);

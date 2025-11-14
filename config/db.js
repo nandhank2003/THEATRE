@@ -1,11 +1,24 @@
+// /config/db.js
 import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    mongoose.set("strictQuery", false); // optional, prevents warnings
+
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 20000, // 20 seconds to find cluster
+      socketTimeoutMS: 45000,          // stable connection
+    });
+
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`❌ Database Connection Error: ${error.message}`);
+    console.error("❌ MongoDB Connection Error:", error.message);
+
+    // helpful Render hint
+    if (error.message.includes("ENODATA") || error.message.includes("ENOTFOUND")) {
+      console.error("⚠️ DNS issue — check MONGO_URI or network on Render");
+    }
+
     process.exit(1);
   }
 };

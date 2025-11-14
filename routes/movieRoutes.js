@@ -139,7 +139,11 @@ router.get("/:id/seats", async (req, res) => {
 // ✅ Add a new movie (Admin)
 router.post("/", async (req, res) => {
   try {
-    const { screenCode, ...rest } = req.body;
+    const { screenCode, poster, ...rest } = req.body; // Explicitly destructure poster
+    if (!poster) { // Add validation for poster
+      return res.status(400).json({ message: "Movie poster URL is required" });
+    }
+
     if (!screenCode) {
       return res
         .status(400)
@@ -154,7 +158,8 @@ router.post("/", async (req, res) => {
     }
 
     const movie = new Movie({
-      ...rest,
+      ...rest, // This will include other movie details
+      poster, // Assign poster explicitly
       screen: screen._id,
       screenCode,
     });
@@ -167,6 +172,7 @@ router.post("/", async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({ message: "Error adding movie", error: err.message });
+    console.error("Error adding movie:", err); // Log the error for debugging
   }
 });
 

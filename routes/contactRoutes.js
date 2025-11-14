@@ -1,7 +1,15 @@
+// /routes/contactRoutes.js
 import express from "express";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 const router = express.Router();
+
+// Lazily initialize Resend client to prevent startup crash if key is missing
+let resend;
+function getResendClient() {
+  if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
+  return resend;
+}
 
 /**
  * @desc    Handle contact form submission
@@ -13,60 +21,58 @@ router.post("/", async (req, res) => {
 
   // Basic validation
   if (!firstName || !email || !subject || !message) {
-    return res.status(400).json({ message: "Please fill all required fields." });
+    return res
+      .status(400)
+      .json({ message: "Please fill all required fields." });
   }
 
-  // --- Special Admin Redirect Logic ---
-  // Check if the submitted email matches the secret admin email from .env
-  if (email.toLowerCase() === process.env.ADMIN_EMAIL_FOR_CONTACT_REDIRECT?.toLowerCase()) {
+  // --- Admin Redirect Logic ---
+  if (
+    process.env.ADMIN_EMAIL_FOR_CONTACT_REDIRECT &&
+    email.toLowerCase() ===
+      process.env.ADMIN_EMAIL_FOR_CONTACT_REDIRECT.toLowerCase()
+  ) {
     console.log(`🤫 Admin access triggered by email: ${email}`);
-    // Send a special response that the frontend can use to redirect
     return res.status(200).json({ isAdminRedirect: true });
   }
 
-  // --- Nodemailer Email Sending Logic (Port 465) ---
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // Use SSL
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  const mailOptions = {
-    from: `"${firstName} ${lastName}" <${process.env.EMAIL_USER}>`, // Send from your verified email
-    to: process.env.CONTACT_EMAIL_RECIPIENT,
-    replyTo: email, // Set the user's email as the reply-to address
-    subject: `New Contact Form Message: ${subject}`,
-    html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-        <h2>New Message from MALABAR CINEHUB Contact Form</h2>
-        <p>You have received a new message from your website's contact form.</p>
-        <hr>
-        <h3>Message Details:</h3>
-        <ul>
-          <li><strong>Name:</strong> ${firstName} ${lastName}</li>
-          <li><strong>Email:</strong> <a href="mailto:${email}">${email}</a></li>
-          <li><strong>Phone:</strong> ${phone || "Not provided"}</li>
-        </ul>
-        <h3>Message:</h3>
-        <p style="background-color: #f4f4f4; padding: 15px; border-radius: 5px;">
-          ${message.replace(/\n/g, "<br>")}
-        </p>
-        <hr>
-        <p style="font-size: 0.8em; color: #777;">This email was sent from the contact form on your MALABAR CINEHUB website.</p>
-      </div>
-    `,
-  };
-
+  // ----------------------------
+  // SEND EMAIL USING RESEND
+  // ----------------------------
   try {
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ success: true, message: "Message sent successfully!" });
+    await getResendClient().emails.send({
+      from: process.env.CONTACT_FROM_EMAIL || "noreply@yourdomain.com",
+      to: process.env.CONTACT_EMAIL_RECIPIENT,
+      subject: `New Contact Form Message: ${subject}`,
+      reply_to: email,
+      html: `
+      <div style="font-family: Arial; line-height: 1.6;">
+        <h2>📩 New Contact Form Message</h2>
+        <p><strong>Name:</strong> ${firstName} ${lastName}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || "Not provided"}</p>
+        <h3>Message:</h3>
+        <div style="padding:12px;background:#f5f5f5;border-radius:5px;">
+          ${message.replace(/\n/g, "<br>")}
+        </div>
+        <br>
+        <p style="color:#777;font-size:12px;">
+          Sent automatically from MALABAR CINEHUB contact form.
+        </p>
+      </div>
+      `,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Message sent successfully!",
+    });
   } catch (error) {
-    console.error("❌ Error sending contact email:", error);
-    res.status(500).json({ message: "Failed to send message. Please try again later." });
+    console.error("❌ RESEND Contact Email Error:", error);
+    return res.status(500).json({
+      message: "Failed to send message. Please try again later.",
+      error: error.message,
+    });
   }
 });
 

@@ -298,7 +298,7 @@ const handleBookingSubmission = async () => {
 
   let sessionUser = null;
   try {
-    const raw = localStorage.getItem("MALABAR CINEHUBUser");
+    const raw = localStorage.getItem("MALABAR_CINEHUB_USER");
     sessionUser = raw ? JSON.parse(raw) : null;
   } catch (error) {
     console.error("Failed to parse session user:", error);

@@ -130,7 +130,7 @@ function setupProfileDropdown() {
         if (logoutBtn) {
             logoutBtn.addEventListener('click', (e) => {
                 // No e.preventDefault() needed, link goes to /auth/logout
-                localStorage.removeItem('MALABAR CINEHUBUser'); // Clear JWT if it exists
+                localStorage.removeItem('MALABAR_CINEHUB_USER'); // Clear JWT if it exists
             });
         }
     }

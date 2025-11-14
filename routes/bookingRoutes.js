@@ -6,6 +6,8 @@ import Booking from "../models/Booking.js";
 import BookingSeat from "../models/BookingSeat.js";
 import Movie from "../models/Movie.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
+import { generateTicket, getTicketByBookingId } from "../utils/ticketGenerator.js";
+import { sendTicketEmail } from "../utils/sendTicketEmail.js";
 
 // Initialize Razorpay
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || "rzp_test_Re7Ks1Il3ik9Ci";
@@ -20,6 +22,9 @@ console.log("Razorpay initialized with key_id:", RAZORPAY_KEY_ID.substring(0, 10
 
 const router = express.Router();
 
+// ===============================
+// 1️⃣ Create Booking (reserve seats - before payment)
+// ===============================
 router.post("/", protect, async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -60,14 +65,13 @@ router.post("/", protect, async (req, res) => {
       });
     }
 
-    // Attempt to lock each seat uniquely
     const booking = new Booking({
       user: req.user._id,
       movie: movie._id,
       screen: screen._id,
       seats: normalizedSeats,
       totalAmount: totalAmount ?? movie.price * normalizedSeats.length,
-      status: "pending", // Will be confirmed after payment
+      status: "pending", // confirmed after payment
       paymentStatus: "pending",
     });
 
@@ -91,7 +95,7 @@ router.post("/", protect, async (req, res) => {
     const populatedBooking = await Booking.findById(booking._id)
       .populate("movie")
       .populate("screen")
-      .populate("user", "firstName lastName email");
+      .populate("user", "name email phone");
 
     res.status(201).json({
       message: "Seats reserved. Please complete payment to confirm booking.",
@@ -114,6 +118,9 @@ router.post("/", protect, async (req, res) => {
   }
 });
 
+// ===============================
+// 2️⃣ Get all bookings for logged-in user (with tickets)
+// ===============================
 router.get("/", protect, async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user._id })
@@ -121,19 +128,23 @@ router.get("/", protect, async (req, res) => {
       .populate("screen")
       .sort({ bookingTime: -1 });
 
-    // Get tickets with QR codes for confirmed bookings
     const bookingsWithTickets = await Promise.all(
       bookings.map(async (booking) => {
-        if (booking.status === "confirmed" && booking.ticketId) {
+        if (booking.status === "confirmed") {
           try {
-            const { getTicketByBookingId } = await import("../utils/ticketGenerator.js");
             const ticket = await getTicketByBookingId(booking._id);
-            return {
-              ...booking.toJSON(),
-              ticket: ticket ? { qrCode: ticket.qrCode, ticketId: ticket.ticketId } : null,
-            };
+            if (ticket) {
+              return {
+                ...booking.toJSON(),
+                ticket: {
+                  ticketId: ticket.ticketId,
+                  qrCode: ticket.qrCode,
+                  used: ticket.used,
+                },
+              };
+            }
           } catch (error) {
-            return booking.toJSON();
+            console.error("Error getting ticket for booking:", error);
           }
         }
         return booking.toJSON();
@@ -147,7 +158,9 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-// Get single ticket by booking ID
+// ===============================
+// 3️⃣ Get single ticket by booking ID
+// ===============================
 router.get("/:id/ticket", protect, async (req, res) => {
   try {
     const booking = await Booking.findOne({
@@ -160,7 +173,6 @@ router.get("/:id/ticket", protect, async (req, res) => {
       return res.status(404).json({ message: "Ticket not found" });
     }
 
-    const { getTicketByBookingId } = await import("../utils/ticketGenerator.js");
     const ticket = await getTicketByBookingId(booking._id);
 
     if (!ticket) {
@@ -174,6 +186,9 @@ router.get("/:id/ticket", protect, async (req, res) => {
   }
 });
 
+// ===============================
+// 4️⃣ Cancel booking (release seats)
+// ===============================
 router.delete("/:id", protect, async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -209,7 +224,9 @@ router.delete("/:id", protect, async (req, res) => {
   }
 });
 
-// Create Razorpay payment order
+// ===============================
+// 5️⃣ Create Razorpay payment order
+// ===============================
 router.post("/:id/create-payment", protect, async (req, res) => {
   try {
     console.log("Creating payment order for booking:", req.params.id);
@@ -235,7 +252,6 @@ router.post("/:id/create-payment", protect, async (req, res) => {
       return res.status(400).json({ message: "Invalid booking amount" });
     }
 
-    // Razorpay minimum amount is 1 INR (100 paise), maximum is 1 crore (100000000 paise)
     const amountInPaise = Math.round(booking.totalAmount * 100);
     if (amountInPaise < 100) {
       console.log("Amount too small for Razorpay:", amountInPaise);
@@ -245,20 +261,18 @@ router.post("/:id/create-payment", protect, async (req, res) => {
       console.log("Amount too large for Razorpay:", amountInPaise);
       return res.status(400).json({ message: "Maximum amount is ₹10,00,000" });
     }
-    
-    // Ensure amount is a valid integer
+
     if (isNaN(amountInPaise) || !isFinite(amountInPaise)) {
       console.log("Invalid amount:", booking.totalAmount, "->", amountInPaise);
       return res.status(400).json({ message: "Invalid booking amount" });
     }
 
-    // Razorpay receipt must be max 40 characters
     const receiptId = `B${booking._id.toString().slice(-8)}${Date.now().toString().slice(-6)}`;
     
     const options = {
       amount: amountInPaise,
       currency: "INR",
-      receipt: receiptId.substring(0, 40), // Ensure max 40 chars
+      receipt: receiptId.substring(0, 40),
       notes: {
         bookingId: booking._id.toString(),
         movieId: booking.movie._id?.toString() || booking.movie.toString(),
@@ -281,7 +295,6 @@ router.post("/:id/create-payment", protect, async (req, res) => {
         response: razorpayError.response?.data
       });
       
-      // Return more specific error
       if (razorpayError.statusCode) {
         return res.status(razorpayError.statusCode).json({
           message: "Razorpay payment order creation failed",
@@ -309,7 +322,9 @@ router.post("/:id/create-payment", protect, async (req, res) => {
   }
 });
 
-// Verify Razorpay payment and confirm booking
+// ===============================
+// 6️⃣ Verify Razorpay payment + confirm booking + generate ticket + send email
+// ===============================
 router.post("/:id/verify-payment", protect, async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -324,6 +339,7 @@ router.post("/:id/verify-payment", protect, async (req, res) => {
     })
       .populate("movie")
       .populate("screen")
+      .populate("user", "name email phone")
       .session(session);
 
     if (!booking) {
@@ -332,7 +348,6 @@ router.post("/:id/verify-payment", protect, async (req, res) => {
       return res.status(404).json({ message: "Booking not found or already processed" });
     }
 
-    // Verify Razorpay signature
     const keySecret = process.env.RAZORPAY_KEY_SECRET || "7Hfjeor4UI0GJD8Bn0HXcZnj";
     const expectedSignature = crypto
       .createHmac("sha256", keySecret)
@@ -345,15 +360,13 @@ router.post("/:id/verify-payment", protect, async (req, res) => {
       return res.status(400).json({ message: "Invalid payment signature" });
     }
 
-    // Update booking status
     booking.status = "confirmed";
     booking.paymentStatus = "completed";
     booking.paymentReference = razorpay_payment_id;
     booking.paymentMethod = "razorpay";
     await booking.save({ session });
 
-    // Generate ticket with QR code
-    const { generateTicket } = await import("../utils/ticketGenerator.js");
+    // ✅ Generate ticket (QR based)
     const ticketData = await generateTicket(booking);
 
     await session.commitTransaction();
@@ -362,28 +375,16 @@ router.post("/:id/verify-payment", protect, async (req, res) => {
     const populatedBooking = await Booking.findById(booking._id)
       .populate("movie")
       .populate("screen")
-      .populate("user", "firstName lastName email");
+      .populate("user", "name email phone");
 
-    // Send ticket email to user (non-blocking)
-    try {
-      const { sendTicketEmail } = await import("../utils/sendTicketEmail.js");
-      if (sendTicketEmail && populatedBooking.user) {
-        // Send email asynchronously - don't wait for it
-        sendTicketEmail(populatedBooking.user, populatedBooking, ticketData)
-          .then((success) => {
-            if (success) {
-              console.log(`✅ Ticket email sent to ${populatedBooking.user.email}`);
-            } else {
-              console.log(`⚠️ Failed to send ticket email to ${populatedBooking.user.email}`);
-            }
-          })
-          .catch((err) => {
-            console.error("Email sending error (non-critical):", err);
-          });
-      }
-    } catch (emailError) {
-      console.error("Error importing email utility (non-critical):", emailError);
-      // Don't fail the booking if email fails
+    // ✅ Send ticket email (non-blocking)
+    if (populatedBooking.user && populatedBooking.user.email) {
+      sendTicketEmail(populatedBooking.user, populatedBooking, ticketData)
+        .then((ok) => {
+          if (ok) console.log(`✅ Ticket email sent to ${populatedBooking.user.email}`);
+          else console.log(`⚠️ Ticket email failed for ${populatedBooking.user.email}`);
+        })
+        .catch((err) => console.error("Ticket email error:", err));
     }
 
     res.json({
@@ -399,10 +400,11 @@ router.post("/:id/verify-payment", protect, async (req, res) => {
   }
 });
 
-// Admin route to get booking statistics
+// ===============================
+// 7️⃣ Admin stats
+// ===============================
 router.get("/admin/stats", protect, admin, async (req, res) => {
   try {
-    // Check if user is admin (you can add admin check here)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -429,14 +431,15 @@ router.get("/admin/stats", protect, admin, async (req, res) => {
   }
 });
 
-// Admin route to get all bookings
+// ===============================
+// 8️⃣ Admin - all bookings
+// ===============================
 router.get("/admin/all", protect, admin, async (req, res) => {
   try {
-    // Fetch all bookings with comprehensive details for the admin panel
     const bookings = await Booking.find()
-      .populate("movie", "title poster")
+      .populate("movie", "title posterUrl")
       .populate("screen", "name")
-      .populate("user", "firstName lastName email")
+      .populate("user", "name email phone")
       .sort({ bookingTime: -1 })
       .limit(100);
     
@@ -447,13 +450,15 @@ router.get("/admin/all", protect, admin, async (req, res) => {
   }
 });
 
-// Admin route to get a single booking's full details
+// ===============================
+// 9️⃣ Admin - single booking
+// ===============================
 router.get("/admin/:id", protect, admin, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
       .populate("movie")
       .populate("screen")
-      .populate("user", "firstName lastName email phone");
+      .populate("user", "name email phone");
 
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
@@ -462,7 +467,7 @@ router.get("/admin/:id", protect, admin, async (req, res) => {
     res.json(booking);
   } catch (error) {
     console.error(`Failed to fetch booking ${req.params.id}:`, error);
-    if (error.kind === 'ObjectId') {
+    if (error.kind === "ObjectId") {
       return res.status(400).json({ message: "Invalid booking ID format" });
     }
     res.status(500).json({ message: "Failed to fetch booking details" });

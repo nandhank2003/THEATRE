@@ -1,35 +1,30 @@
 {
   "name": "theatre-booking",
   "version": "1.0.0",
-  "description": "Multiplex theatre booking system with admin panel, movie uploads, and ticket management.",
+  "description": "Multiplex theatre booking system with OTP login, QR tickets, admin panel, movie uploads, and cloud storage.",
   "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "cloudinary": "^1.41.0",
+    "cloudinary": "^1.41.3",
     "compression": "^1.8.1",
-    "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
-    "detect-port": "^2.1.0",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-session": "^1.18.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.3.3",
+    "mongoose": "^8.19.3",
     "morgan": "^1.10.1",
-    "nodemailer": "^7.0.10",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
     "qrcode": "^1.5.4",
-    "razorpay": "^2.9.6"
+    "razorpay": "^2.9.6",
+    "resend": "^3.5.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.11"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -39,10 +34,12 @@
     "cinema",
     "booking",
     "movies",
-    "admin-dashboard",
+    "OTP-login",
+    "QR-ticket",
     "cloudinary",
     "express",
-    "mongodb"
+    "mongodb",
+    "resend"
   ],
   "author": "Nandhan K",
   "license": "MIT"

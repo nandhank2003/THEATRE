@@ -34,7 +34,7 @@ document.addEventListener("click", (e) => {
 // 👤 CHECK USER LOGIN STATUS (LOCALSTORAGE)
 // ==========================================================
 function checkLoginStatus() {
-  const user = JSON.parse(localStorage.getItem("MALABAR CINEHUBUser"));
+  const user = JSON.parse(localStorage.getItem("MALABAR_CINEHUB_USER"));
   const loginBtn = document.querySelector(".login-btn");
 
   if (user && loginBtn) {
@@ -98,7 +98,7 @@ function setupProfileDropdown() {
         // The link now points to /auth/logout, so we just let it navigate.
         // For SPA-like behavior, you could do:
         // e.preventDefault();
-        // localStorage.removeItem("MALABAR CINEHUBUser");
+        // localStorage.removeItem("MALABAR_CINEHUB_USER");
         // window.location.href = "/auth/logout";
       });
     }

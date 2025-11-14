@@ -1,34 +1,60 @@
 // ==========================================================
+// 🎬 MALABAR CINEHUB — MOBILE RESPONSIVE FRONTEND SCRIPT
+// ==========================================================
+
+// ==========================================================
+// 🔐 GLOBAL AUTH HELPERS
+// ==========================================================
+
+function getCurrentUser() {
+    try {
+        const raw = localStorage.getItem("MALABAR_CINEHUB_USER");
+        if (!raw) return null;
+        return JSON.parse(raw);
+    } catch (err) {
+        console.error("Auth parse error:", err);
+        return null;
+    }
+}
+
+function isLoggedIn() {
+    const user = getCurrentUser();
+    return !!(user && user.loggedIn);
+}
+
+function requireLogin(event) {
+    const user = getCurrentUser();
+
+    if (!user || !user.loggedIn) {
+        if (event && event.preventDefault) event.preventDefault();
+        window.location.href = "/login-form/login.html";
+        return false;
+    }
+
+    return true;
+}
+
+window.MCH_AUTH = {
+    getCurrentUser,
+    isLoggedIn,
+    requireLogin,
+};
+
+// ==========================================================
 // 🎬 MAIN INITIALIZATION
 // ==========================================================
 
 function initializeApp() {
-    // Initialize navbar functionality
     initNavbar();
-    
-    // Initialize scroll animations
     initScrollAnimations();
-    
-    // Initialize partner logos animation
     initPartnerLogos();
-    
-    // Initialize smooth scrolling
     initSmoothScrolling();
-    
-    // Initialize intersection observers
     initIntersectionObservers();
-    
-    // Initialize button effects
     initButtonEffects();
-    
-    // Initialize responsive behavior
     initResponsiveBehavior();
-    
-    // Initialize ticket booking
     initTicketBooking();
-    
-    // Check login status
     checkLoginStatus();
+    initMobileBottomNav();
 }
 
 // ==========================================================
@@ -40,68 +66,90 @@ function initNavbar() {
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
 
-    if (!navbar || !hamburger || !navLinks) {
-        console.warn('Navbar elements not found');
-        return;
-    }
+    if (!navbar) return;
 
     // Navbar scroll effect
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
+        if (window.scrollY > 50) {
             navbar.classList.add('scrolled');
         } else {
             navbar.classList.remove('scrolled');
         }
     });
 
-    // Hamburger menu toggle
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-    });
-
-    // Close menu when clicking on a link
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
+    if (hamburger && navLinks) {
+        // Hamburger menu toggle
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
         });
-    });
 
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
-            hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
-        }
-    });
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    }
 }
 
 // ==========================================================
-// 🔐 LOGIN STATUS & PROFILE
+// 📱 MOBILE BOTTOM NAVIGATION
 // ==========================================================
 
-function checkLoginStatus() {
-    const user = JSON.parse(localStorage.getItem('MALABAR CINEHUBUser'));
-    const loginBtn = document.querySelector('.login-btn');
+function initMobileBottomNav() {
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) return;
+
+    // Create mobile bottom nav if not exists
+    let bottomNav = document.querySelector('.mobile-bottom-nav');
+    if (bottomNav) return; // Already exists
+
+    bottomNav = document.createElement('div');
+    bottomNav.className = 'mobile-bottom-nav';
     
-    if (user && loginBtn) {
-        // User is logged in - show profile dropdown
-        loginBtn.outerHTML = `
+    const user = getCurrentUser();
+    
+    if (user && user.loggedIn) {
+        // Show ticket button and profile
+        bottomNav.innerHTML = `
+            <a href="/booking/booking.html" class="ticket-btn" data-require-login="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
+                    <path d="M13 5v2"></path>
+                    <path d="M13 17v2"></path>
+                    <path d="M13 11v2"></path>
+                </svg>
+                Book Tickets
+            </a>
             <div class="profile-container">
-                <button class="profile-btn" id="profileBtn">
-                    <div class="profile-avatar">${user.firstName.charAt(0)}${user.lastName.charAt(0)}</div>
-                    <span class="profile-name">${user.firstName}</span>
-                    <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                <button class="profile-btn" id="mobileProfileBtn">
+                    <div class="profile-avatar">
+                        ${(user.firstName?.charAt(0) || "U")}${user.lastName?.charAt(0) || ""}
+                    </div>
+                    <span class="profile-name">${user.firstName || "User"}</span>
                 </button>
-                <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-menu" id="mobileDropdownMenu">
                     <div class="dropdown-header">
-                        <div class="dropdown-avatar">${user.firstName.charAt(0)}${user.lastName.charAt(0)}</div>
+                        <div class="dropdown-avatar">
+                            ${(user.firstName?.charAt(0) || "U")}${user.lastName?.charAt(0) || ""}
+                        </div>
                         <div class="dropdown-info">
-                            <p class="dropdown-name">${user.firstName} ${user.lastName}</p>
-                            <p class="dropdown-email">${user.email}</p>
+                            <p class="dropdown-name">${user.firstName || ""} ${user.lastName || ""}</p>
+                            <p class="dropdown-email">${user.email || ""}</p>
                         </div>
                     </div>
                     <div class="dropdown-divider"></div>
@@ -119,15 +167,8 @@ function checkLoginStatus() {
                         </svg>
                         My Bookings
                     </a>
-                    <a href="#" class="dropdown-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M12 1v6m0 6v6m4.22-13.22l-1.42 1.42M10.2 13.8l-1.42 1.42M1 12h6m6 0h6M4.22 4.22l1.42 1.42M13.8 13.8l1.42 1.42M4.22 19.78l1.42-1.42M13.8 10.2l1.42-1.42"></path>
-                        </svg>
-                        Settings
-                    </a>
                     <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item logout-item" id="logoutBtn">
+                    <a href="#" class="dropdown-item logout-item" id="mobileLogoutBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                             <polyline points="16 17 21 12 16 7"></polyline>
@@ -138,8 +179,130 @@ function checkLoginStatus() {
                 </div>
             </div>
         `;
+    } else {
+        // Show ticket button and login
+        bottomNav.innerHTML = `
+            <a href="/booking/booking.html" class="ticket-btn" data-require-login="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
+                    <path d="M13 5v2"></path>
+                    <path d="M13 17v2"></path>
+                    <path d="M13 11v2"></path>
+                </svg>
+                Book
+            </a>
+            <a href="/login-form/login.html" class="login-btn">Login</a>
+        `;
+    }
+    
+    document.body.appendChild(bottomNav);
+    
+    // Setup mobile profile dropdown
+    if (user && user.loggedIn) {
+        setupMobileProfileDropdown();
+    }
+    
+    // Reinit ticket booking for mobile nav
+    initTicketBooking();
+}
+
+function setupMobileProfileDropdown() {
+    const profileBtn = document.getElementById('mobileProfileBtn');
+    const dropdownMenu = document.getElementById('mobileDropdownMenu');
+    const logoutBtn = document.getElementById('mobileLogoutBtn');
+    
+    if (!profileBtn || !dropdownMenu) return;
+    
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+        profileBtn.classList.toggle('active');
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+            profileBtn.classList.remove('active');
+        }
+    });
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem("MALABAR_CINEHUB_USER");
+            window.location.reload();
+        });
+    }
+}
+
+// ==========================================================
+// 🔐 LOGIN STATUS & PROFILE (Desktop Navbar)
+// ==========================================================
+
+function checkLoginStatus() {
+    const user = getCurrentUser();
+    const loginBtn = document.querySelector('.nav-buttons .login-btn');
+    
+    if (!loginBtn) return;
+
+    if (user && user.loggedIn) {
+        // Replace login button with profile dropdown
+        const navButtons = document.querySelector('.nav-buttons');
+        const ticketBtn = navButtons.querySelector('.ticket-btn');
         
-        // Add profile dropdown functionality
+        navButtons.innerHTML = '';
+        if (ticketBtn) navButtons.appendChild(ticketBtn);
+        
+        const profileContainer = document.createElement('div');
+        profileContainer.className = 'profile-container';
+        profileContainer.innerHTML = `
+            <button class="profile-btn" id="profileBtn">
+                <div class="profile-avatar">
+                    ${(user.firstName?.charAt(0) || "U")}${user.lastName?.charAt(0) || ""}
+                </div>
+                <span class="profile-name">${user.firstName || "User"}</span>
+                <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                    <div class="dropdown-avatar">
+                        ${(user.firstName?.charAt(0) || "U")}${user.lastName?.charAt(0) || ""}
+                    </div>
+                    <div class="dropdown-info">
+                        <p class="dropdown-name">${user.firstName || ""} ${user.lastName || ""}</p>
+                        <p class="dropdown-email">${user.email || ""}</p>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    My Profile
+                </a>
+                <a href="#" class="dropdown-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                    </svg>
+                    My Bookings
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item logout-item" id="logoutBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+        `;
+        
+        navButtons.appendChild(profileContainer);
         setupProfileDropdown();
     }
 }
@@ -149,30 +312,27 @@ function setupProfileDropdown() {
     const dropdownMenu = document.getElementById('dropdownMenu');
     const logoutBtn = document.getElementById('logoutBtn');
     
-    if (profileBtn && dropdownMenu) {
-        // Toggle dropdown
-        profileBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu.classList.toggle('show');
-            profileBtn.classList.toggle('active');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!profileBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.classList.remove('show');
-                profileBtn.classList.remove('active');
-            }
-        });
-        
-        // Logout functionality
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                localStorage.removeItem('MALABAR CINEHUBUser');
-                window.location.reload();
-            });
+    if (!profileBtn || !dropdownMenu) return;
+    
+    profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+        profileBtn.classList.toggle('active');
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+            profileBtn.classList.remove('active');
         }
+    });
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem("MALABAR_CINEHUB_USER");
+            window.location.reload();
+        });
     }
 }
 
@@ -181,34 +341,30 @@ function setupProfileDropdown() {
 // ==========================================================
 
 function initTicketBooking() {
-    const ticketBtn = document.querySelector('.ticket-btn');
-    
-    if (ticketBtn) {
-        ticketBtn.addEventListener('click', function(e) {
-            // Check if user is logged in
-            const user = JSON.parse(localStorage.getItem('MALABAR CINEHUBUser'));
+    document.querySelectorAll('.ticket-btn').forEach(btn => {
+        // Remove old listeners by cloning
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener('click', function(e) {
+            if (!requireLogin(e)) return;
             
-            if (!user) {
-                // If not logged in, show login prompt or redirect to login
-                e.preventDefault();
-                const proceed = confirm('Please login to book tickets. Would you like to login now?');
-                if (proceed) {
-                    window.location.href = '/public/login-form/login.html';
-                }
-                return;
-            }
-            
-            // Add loading state
             this.classList.add('loading');
-            
-            // Simulate booking process
             setTimeout(() => {
-                this.classList.remove('loading');
-                // Redirect to booking page
-                window.location.href = this.getAttribute('href');
-            }, 1000);
+                const href = this.getAttribute('href') || "/booking/booking.html";
+                window.location.href = href;
+            }, 500);
         });
-    }
+    });
+
+    document.querySelectorAll("[data-require-login='true']").forEach(el => {
+        const newEl = el.cloneNode(true);
+        el.parentNode.replaceChild(newEl, el);
+        
+        newEl.addEventListener("click", (e) => {
+            if (!requireLogin(e)) return;
+        });
+    });
 }
 
 // ==========================================================
@@ -216,18 +372,16 @@ function initTicketBooking() {
 // ==========================================================
 
 function initScrollAnimations() {
-    // Add parallax effect to hero section
     window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
         const hero = document.querySelector('.hero');
-        if (hero) {
+        if (hero && window.innerWidth > 768) {
             hero.style.transform = `translateY(${scrolled * 0.5}px)`;
         }
     });
 }
 
 function initPartnerLogos() {
-    // Logo entrance animation with IntersectionObserver
     const observerOptions = {
         threshold: 0.2,
         rootMargin: '0px 0px -50px 0px'
@@ -236,7 +390,7 @@ function initPartnerLogos() {
     const logoObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const index = entry.target.dataset.index;
+                const index = entry.target.dataset.index || 0;
                 const delay = parseInt(index) * 100;
                 
                 setTimeout(() => {
@@ -248,37 +402,29 @@ function initPartnerLogos() {
         });
     }, observerOptions);
 
-    // Observe all logo wrappers
     document.querySelectorAll('.logo-wrapper').forEach(wrapper => {
         logoObserver.observe(wrapper);
     });
-
-    // Duplicate marquee content for seamless loop
-    const marqueeContent = document.querySelector('.marquee-content');
-    if (marqueeContent) {
-        const clone = marqueeContent.cloneNode(true);
-        marqueeContent.parentElement.appendChild(clone);
-    }
 }
 
 function initSmoothScrolling() {
-    // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href || href === "#") return;
+            const target = document.querySelector(href);
+            if (!target) return;
+
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         });
     });
 }
 
 function initIntersectionObservers() {
-    // Initialize any additional intersection observers here
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -292,14 +438,12 @@ function initIntersectionObservers() {
         });
     }, observerOptions);
 
-    // Observe elements with fade-in class
     document.querySelectorAll('.fade-in-on-scroll').forEach(el => {
         fadeObserver.observe(el);
     });
 }
 
 function initButtonEffects() {
-    // Book Now button ripple effect
     const bookNowBtn = document.querySelector('.book-now-btn');
     
     if (bookNowBtn) {
@@ -321,44 +465,43 @@ function initButtonEffects() {
             setTimeout(() => {
                 ripple.remove();
             }, 600);
-            
-            // You can add booking functionality here
-            console.log('Book Now clicked!');
         });
     }
-
-    // Add cursor glow effect (optional premium feature)
-    document.addEventListener('mousemove', (e) => {
-        const glow = document.createElement('div');
-        glow.className = 'cursor-glow';
-        glow.style.left = e.pageX + 'px';
-        glow.style.top = e.pageY + 'px';
-        document.body.appendChild(glow);
-        
-        setTimeout(() => {
-            glow.remove();
-        }, 1000);
-    });
 }
 
 function initResponsiveBehavior() {
-    // Handle responsive behavior
+    let resizeTimer;
     window.addEventListener('resize', () => {
-        const hamburger = document.getElementById('hamburger');
-        const navLinks = document.getElementById('navLinks');
-        
-        if (window.innerWidth > 768) {
-            hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
-        }
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            
+            if (window.innerWidth > 768) {
+                if (hamburger) hamburger.classList.remove('active');
+                if (navLinks) {
+                    navLinks.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+                
+                // Remove mobile bottom nav on desktop
+                const mobileNav = document.querySelector('.mobile-bottom-nav');
+                if (mobileNav) mobileNav.remove();
+            } else {
+                // Reinit mobile bottom nav
+                const mobileNav = document.querySelector('.mobile-bottom-nav');
+                if (!mobileNav) {
+                    initMobileBottomNav();
+                }
+            }
+        }, 250);
     });
 }
 
 // ==========================================================
-// 🎯 EVENT LISTENERS & INITIALIZATION
+// 🚀 START APPLICATION
 // ==========================================================
 
-// Add loading animation
 window.addEventListener('load', () => {
     document.body.style.opacity = '0';
     setTimeout(() => {
@@ -367,282 +510,15 @@ window.addEventListener('load', () => {
     }, 100);
 });
 
-// Add CSS for cursor glow and profile dropdown dynamically
-const style = document.createElement('style');
-style.textContent = `
-    .cursor-glow {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(106, 17, 203, 0.3) 0%, transparent 70%);
-        pointer-events: none;
-        z-index: 9999;
-        animation: glowFade 1s ease-out forwards;
-    }
-    
-    @keyframes glowFade {
-        to {
-            opacity: 0;
-            transform: scale(2);
-        }
-    }
-    
-    .ripple-effect {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
-        transform: scale(0);
-        animation: ripple 0.6s ease-out;
-        pointer-events: none;
-    }
-    
-    @keyframes ripple {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-    
-    /* Profile Dropdown Styles */
-    .profile-container {
-        position: relative;
-        z-index: 1001;
-    }
-    
-    .profile-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-        padding: 0.5rem 1rem 0.5rem 0.5rem;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        color: #fff;
-        font-weight: 600;
-        border-radius: 50px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;
-    }
-    
-    .profile-btn:hover {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.3);
-        transform: translateY(-2px);
-    }
-    
-    .profile-btn.active {
-        background: rgba(255, 255, 255, 0.15);
-    }
-    
-    .profile-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #6a11cb, #000000ff);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-    }
-    
-    .profile-name {
-        font-weight: 500;
-        font-size: 0.9rem;
-    }
-    
-    .dropdown-arrow {
-        transition: transform 0.3s ease;
-    }
-    
-    .profile-btn.active .dropdown-arrow {
-        transform: rotate(180deg);
-    }
-    
-    .dropdown-menu {
-        position: absolute;
-        top: calc(100% + 0.8rem);
-        right: 0;
-        min-width: 260px;
-        background: rgba(17, 17, 17, 0.98);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-10px);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1000;
-    }
-    
-    .dropdown-menu.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-    
-    .dropdown-header {
-        padding: 1.2rem;
-        display: flex;
-        align-items: center;
-        gap: 0.9rem;
-    }
-    
-    .dropdown-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #6a11cb, #2575fc);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 1rem;
-        letter-spacing: 0.5px;
-        flex-shrink: 0;
-    }
-    
-    .dropdown-info {
-        flex: 1;
-        min-width: 0;
-    }
-    
-    .dropdown-name {
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: #fff;
-        margin-bottom: 0.2rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    .dropdown-email {
-        font-size: 0.8rem;
-        color: #888;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    .dropdown-divider {
-        height: 1px;
-        background: rgba(255, 255, 255, 0.08);
-        margin: 0.5rem 0;
-    }
-    
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-        padding: 0.9rem 1.2rem;
-        color: #ccc;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-    }
-    
-    .dropdown-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-        color: #fff;
-    }
-    
-    .dropdown-item svg {
-        flex-shrink: 0;
-    }
-    
-    .logout-item {
-        color: #ff6b6b;
-    }
-    
-    .logout-item:hover {
-        background: rgba(255, 107, 107, 0.1);
-        color: #ff5252;
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        .profile-name {
-            display: none;
-        }
-        
-        .profile-btn {
-            padding: 0.5rem;
-        }
-        
-        .dropdown-arrow {
-            display: none;
-        }
-        
-        .dropdown-menu {
-            right: -10px;
-            min-width: 240px;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .dropdown-menu {
-            right: -20px;
-            left: auto;
-            min-width: 220px;
-        }
-        
-        .dropdown-header {
-            padding: 1rem;
-        }
-        
-        .dropdown-avatar {
-            width: 42px;
-            height: 42px;
-            font-size: 0.9rem;
-        }
-        
-        .dropdown-item {
-            padding: 0.8rem 1rem;
-            font-size: 0.85rem;
-        }
-    }
-    
-    /* Loading state for buttons */
-    .ticket-btn.loading {
-        pointer-events: none;
-        opacity: 0.7;
-    }
-    
-    .ticket-btn.loading::after {
-        content: '';
-        position: absolute;
-        width: 16px;
-        height: 16px;
-        border: 2px solid transparent;
-        border-top: 2px solid currentColor;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-`;
-document.head.appendChild(style);
-
-// ==========================================================
-// 🚀 START APPLICATION
-// ==========================================================
-
-// Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
-// Export functions for global access (if needed)
+// Export functions
 window.MALABAR_CINEHUB = {
     initializeApp,
-    checkLoginStatus
+    checkLoginStatus,
+    getCurrentUser,
+    isLoggedIn,
+    requireLogin,
 };
