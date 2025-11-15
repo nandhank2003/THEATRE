@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Delivery Notice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+        :root {
+            --popup-base-bg: #0a0a0c;
+            --popup-panel-bg: rgba(20, 22, 28, 0.65);
+            --popup-text-primary: #e0e0e0;
+            --popup-text-secondary: #a0a0b0;
+            --popup-glow-color-1: #4f46e5; /* Indigo */
+            --popup-glow-color-2: #a855f7; /* Purple */
+            --popup-glow-color-3: #2563eb; /* Blue */
+        }
+
+        /* This can be removed if your main CSS already defines a font-family */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--popup-base-bg);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px) saturate(150%);
+            -webkit-backdrop-filter: blur(12px) saturate(150%);
+            z-index: 1000;
+            padding: 1rem;
+            opacity: 0;
+            animation: popupFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .popup-card {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            background: var(--popup-panel-bg);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transform: scale(0.95);
+            animation: popupScaleIn 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .popup-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 180deg at 50% 50%,
+                var(--popup-glow-color-1),
+                var(--popup-glow-color-2),
+                var(--popup-glow-color-3),
+                var(--popup-glow-color-1)
+            );
+            filter: blur(80px);
+            transform: translate(-50%, -50%);
+            animation: popupLiquidGlow 15s linear infinite;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .popup-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .popup-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--popup-text-secondary);
+            margin: 0.75rem 0;
+        }
+
+        .popup-text strong {
+            color: var(--popup-text-primary);
+            font-weight: 500;
+        }
+
+        .popup-button {
+            position: relative;
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fff;
+            background-color: transparent;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .popup-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 10px;
+            padding: 2px;
+            background: conic-gradient(
+                from var(--angle),
+                transparent 20%,
+                var(--popup-glow-color-2),
+                var(--popup-glow-color-1)
+            );
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: popupSpin 4s linear infinite;
+            transition: opacity 0.3s ease;
+        }
+        
+        .popup-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-button:hover::before {
+            opacity: 0.7;
+        }
+
+        .popup-overlay.closing {
+            animation: popupFadeOut 0.4s ease-out forwards;
+        }
+
+        .popup-overlay.closing .popup-card {
+            animation: popupScaleOut 0.4s ease-out forwards;
+        }
+
+        @keyframes popupFadeIn { to { opacity: 1; } }
+        @keyframes popupScaleIn { to { opacity: 1; transform: scale(1); } }
+        @keyframes popupFadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes popupScaleOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0.95); opacity: 0; } }
+        @keyframes popupLiquidGlow { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        @keyframes popupSpin { to { --angle: 360deg; } }
+    </style>
+</head>
+<body>
+
+    <div class="popup-overlay" id="otp-notice-popup">
+        <div class="popup-card">
+            <h2 class="popup-title">🚨 OTP Delivery Notice</h2>
+            <p class="popup-text">
+                This website is hosted on a free-tier backend (Render) using a free email API (Resend).
+            </p>
+            <p class="popup-text">
+                Free plans cannot guarantee fast or reliable OTP delivery. Sometimes the OTP email may be delayed or may not arrive.
+            </p>
+            <p class="popup-text">
+                This is <strong>NOT a code issue</strong> — OTP works perfectly on paid hosting.
+            </p>
+            <p class="popup-text">
+                This project is only for skill showcase.
+            </p>
+            <button class="popup-button">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const popupOverlay = document.getElementById('otp-notice-popup');
+        const okButton = popupOverlay.querySelector('.popup-button');
+
+        function closePopup() {
+            popupOverlay.classList.add('closing');
+            popupOverlay.addEventListener('animationend', () => {
+                popupOverlay.style.display = 'none';
+                popupOverlay.classList.remove('closing'); 
+            }, { once: true });
+        }
+
+        okButton.addEventListener('click', closePopup);
+    </script>
+
+</body>
+</html>
