@@ -9,18 +9,341 @@
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/style.css">
-    
-    <!-- Prevent zoom on input focus (iOS) -->
+
     <style>
         input, textarea, select {
             font-size: 16px !important;
         }
+        
+        /* CINEMATIC POPUP STYLES */
+        #otpNoticePopup {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+        }
+        
+        #otpNoticePopup.show {
+            display: block;
+        }
+        
+        .popup-liquid-bg {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 30%, rgba(60, 60, 60, 0.2) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(40, 40, 40, 0.18) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(80, 80, 80, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 40% 60%, rgba(100, 100, 100, 0.12) 0%, transparent 55%);
+            animation: liquidFlow 20s ease-in-out infinite;
+            filter: blur(80px);
+        }
+        
+        @keyframes liquidFlow {
+            0%, 100% { transform: scale(1) translateY(0); opacity: 0.4; }
+            50% { transform: scale(1.2) translateY(-20px); opacity: 0.6; }
+        }
+        
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 999;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .popup-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 560px;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(18, 18, 18, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 0 80px rgba(106, 17, 203, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: popupScale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes popupScale {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) translateY(30px); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1) translateY(0); }
+        }
+        
+        .popup-glow {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.4) 0%, rgba(37, 117, 252, 0.3) 50%, rgba(139, 92, 246, 0.4) 100%);
+            border-radius: 24px;
+            filter: blur(20px);
+            opacity: 0.4;
+            animation: glowPulse 3s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        
+        .popup-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .icon-wrapper {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.2), rgba(37, 117, 252, 0.15));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 8px 24px rgba(106, 17, 203, 0.3), 0 0 40px rgba(139, 92, 246, 0.2);
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(106, 17, 203, 0.3), 0 0 40px rgba(139, 92, 246, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 12px 32px rgba(106, 17, 203, 0.5), 0 0 60px rgba(139, 92, 246, 0.4); }
+        }
+        
+        .alert-icon {
+            width: 36px;
+            height: 36px;
+            color: #8b5cf6;
+            filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
+        }
+        
+        .popup-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        
+        .popup-message {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        .popup-message p {
+            margin-bottom: 1rem;
+        }
+        
+        .popup-message p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .popup-message strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        .popup-message .highlight {
+            color: #8b5cf6;
+            font-weight: 500;
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+        
+        .final-note {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 1rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .ok-button {
+            width: 100%;
+            position: relative;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(18, 18, 18, 0.9) 100%);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        
+        .ok-button::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.6) 0%, rgba(37, 117, 252, 0.5) 50%, rgba(139, 92, 246, 0.6) 100%);
+            border-radius: 12px;
+            z-index: -2;
+            animation: borderFlow 3s linear infinite;
+        }
+        
+        @keyframes borderFlow {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1.1); }
+        }
+        
+        .button-glow {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.15) 0%, rgba(37, 117, 252, 0.1) 50%, rgba(139, 92, 246, 0.15) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 10px;
+        }
+        
+        .ok-button:hover .button-glow {
+            opacity: 1;
+        }
+        
+        .ok-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(106, 17, 203, 0.4), 0 0 60px rgba(139, 92, 246, 0.3);
+        }
+        
+        .ok-button:active {
+            transform: translateY(0);
+        }
+        
+        .button-text {
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes popupClose {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1) translateY(0); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8) translateY(30px); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .popup-container {
+                padding: 2.5rem 2rem;
+                max-width: 90%;
+            }
+            .popup-title {
+                font-size: 1.4rem;
+            }
+            .popup-message {
+                font-size: 0.9rem;
+            }
+            .icon-wrapper {
+                width: 60px;
+                height: 60px;
+            }
+            .alert-icon {
+                width: 30px;
+                height: 30px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .popup-container {
+                padding: 2rem 1.5rem;
+                border-radius: 20px;
+            }
+            .popup-title {
+                font-size: 1.2rem;
+                margin-bottom: 1.2rem;
+            }
+            .popup-message {
+                font-size: 0.85rem;
+                margin-bottom: 1.5rem;
+            }
+            .icon-wrapper {
+                width: 55px;
+                height: 55px;
+                margin-bottom: 1.2rem;
+            }
+            .ok-button {
+                padding: 0.9rem 1.5rem;
+                font-size: 0.95rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- OTP Notice Popup -->
+    <div id="otpNoticePopup">
+        <div class="popup-liquid-bg"></div>
+        <div class="popup-overlay" id="popupOverlay"></div>
+        
+        <div class="popup-container" id="popupContainer">
+            <div class="popup-glow"></div>
+            
+            <div class="popup-content">
+                <div class="icon-wrapper">
+                    <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                
+                <h2 class="popup-title">🚨 OTP Delivery Notice</h2>
+                
+                <div class="popup-message">
+                    <p>This website is hosted on a <strong>free-tier backend (Render)</strong> using a <strong>free email API (Resend)</strong>.</p>
+                    
+                    <p>Free plans cannot guarantee fast or reliable OTP delivery.</p>
+                    
+                    <p>Sometimes the OTP email may be <span class="highlight">delayed or may not arrive</span>.</p>
+                    
+                    <p>This is <strong>NOT a code issue</strong> — OTP works perfectly on paid hosting.</p>
+                    
+                    <p class="final-note">This project is only for <span class="highlight">skill showcase</span>.</p>
+                    
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(139, 92, 246, 0.1); border-left: 3px solid #8b5cf6; border-radius: 8px;">
+                        <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 0.5rem;"><strong>📧 Test Login Credentials:</strong></p>
+                        <p style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.3rem;">Email: <span class="highlight">nandhankd@gmail.com</span></p>
+                        <p style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin: 0;">Password: <span class="highlight">Nandhan@54321</span></p>
+                    </div>
+                </div>
+                
+                <button class="ok-button" id="okButton">
+                    <span class="button-glow"></span>
+                    <span class="button-text">OK, I Understand</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Navbar -->
     <nav id="navbar">
         <div class="logo">
@@ -28,7 +351,6 @@
             <span>MALABAR CINEHUB</span>
         </div>
         
-        <!-- Desktop Navigation Links -->
         <ul class="nav-links" id="navLinks">
             <li><a href="/index.html">Home</a></li>
             <li><a href="/about/about.html">About</a></li>
@@ -36,27 +358,19 @@
             <li><a href="/contact/contact.html">Contact</a></li>
         </ul>
         
-        <!-- Desktop Nav Buttons (Ticket + Login/Profile) -->
         <div class="nav-buttons">
-           <a href="/booking/booking.html" 
-   class="ticket-btn" 
-   data-require-login="true">
-
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" 
-         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
-        <path d="M13 5v2"></path>
-        <path d="M13 17v2"></path>
-        <path d="M13 11v2"></path>
-    </svg>
-
-    <span>Tickets</span>
-</a>
-
+           <a href="/booking/booking.html" class="ticket-btn" data-require-login="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"></path>
+                    <path d="M13 5v2"></path>
+                    <path d="M13 17v2"></path>
+                    <path d="M13 11v2"></path>
+                </svg>
+                <span>Tickets</span>
+            </a>
             <a href="/login-form/login.html" class="login-btn">Login</a>
         </div>
 
-        <!-- Hamburger Menu (Mobile) -->
         <div class="hamburger" id="hamburger">
             <span></span>
             <span></span>
@@ -81,7 +395,6 @@
     <section class="partners-section">
         <h2 class="section-title">Our Film Partners</h2>
         <div class="pyramid-container">
-            <!-- Row 1: 1 logo -->
             <div class="pyramid-row row-1">
                 <div class="logo-wrapper" data-index="0">
                     <div class="logo-box">
@@ -90,7 +403,6 @@
                 </div>
             </div>
             
-            <!-- Row 2: 2 logos -->
             <div class="pyramid-row row-2">
                 <div class="logo-wrapper" data-index="1">
                     <div class="logo-box">
@@ -104,7 +416,6 @@
                 </div>
             </div>
             
-            <!-- Row 3: 3 logos -->
             <div class="pyramid-row row-3">
                 <div class="logo-wrapper" data-index="3">
                     <div class="logo-box">
@@ -123,7 +434,6 @@
                 </div>
             </div>
             
-            <!-- Row 4: 4 logos -->
             <div class="pyramid-row row-4">
                 <div class="logo-wrapper" data-index="6">
                     <div class="logo-box">
@@ -148,7 +458,6 @@
             </div>
         </div>
         
-        <!-- Cinema Technology Features -->
         <div class="cinema-tech-section">
             <h3 class="tech-title">Premium Cinema Experience</h3>
             <div class="tech-logos">
@@ -173,7 +482,6 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
-            <!-- Footer Top -->
             <div class="footer-top">
                 <div class="footer-col footer-brand">
                     <div class="footer-logo">
@@ -230,7 +538,6 @@
                 </div>
             </div>
 
-            <!-- Footer Bottom -->
             <div class="footer-bottom">
                 <p>&copy; 2025 MALABAR CINEHUB. All Rights Reserved.</p>
                 <div class="footer-links">
@@ -244,9 +551,55 @@
         </div>
     </footer>
 
-    <!-- Mobile Bottom Navigation will be injected here by JavaScript -->
-
     <!-- Scripts -->
     <script src="/script.js"></script>
+    
+    <script>
+        // Show OTP notice popup on EVERY page load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Always show popup (removed localStorage check)
+            const popup = document.getElementById('otpNoticePopup');
+            if (popup) {
+                popup.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // OK Button Click Handler
+            const okButton = document.getElementById('okButton');
+            const popupContainer = document.getElementById('popupContainer');
+            const popupOverlay = document.getElementById('popupOverlay');
+            
+            function closePopup() {
+                if (popupContainer && popupOverlay) {
+                    popupContainer.style.animation = 'popupClose 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                    popupOverlay.style.animation = 'fadeOut 0.4s ease forwards';
+                    
+                    setTimeout(() => {
+                        // Removed localStorage set - popup will show again on refresh
+                        const popup = document.getElementById('otpNoticePopup');
+                        if (popup) {
+                            popup.classList.remove('show');
+                            popup.style.display = 'none';
+                        }
+                        document.body.style.overflow = '';
+                    }, 400);
+                }
+            }
+            
+            if (okButton) {
+                okButton.addEventListener('click', closePopup);
+            }
+            
+            if (popupOverlay) {
+                popupOverlay.addEventListener('click', closePopup);
+            }
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closePopup();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
